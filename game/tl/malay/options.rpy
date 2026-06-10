@@ -6,3 +6,11 @@ translate malay strings:
     old "Empathy V1"
     new ""
 
+# TODO: Translation updated at 2026-06-11 01:43
+
+translate malay strings:
+
+    # game/options.rpy:15
+    old "Hana Adaptive"
+    new "Hana Adaptive"
+

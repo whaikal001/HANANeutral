@@ -1479,3 +1479,285 @@ translate malay strings:
     old "I think that's enough for me today"
     new "Saya rasa itu sudah cukup untuk saya hari ini"
 
+# TODO: Translation updated at 2026-06-11 01:43
+
+# game/script.rpy:1212
+translate malay start_d301d3c2:
+
+    # e "Before we continue, would you like some soft background music while we talk?"
+    e "Sebelum kita teruskan, adakah anda mahu muzik latar yang lembut semasa kita berbual?"
+
+# game/script.rpy:1213
+translate malay start_e7620a86:
+
+    # e "Some people find it relaxing, and others prefer quiet. Either is completely fine."
+    e "Sesetengah orang merasakannya menenangkan, dan ada yang lebih suka suasana sunyi. Kedua-duanya tidak mengapa."
+
+# game/script.rpy:1219
+translate malay start_ba4f5ec5:
+
+    # e "Alright. I'll keep it gentle in the background."
+    e "Baiklah. Saya akan pasangkan muzik yang lembut di latar belakang."
+
+# game/script.rpy:1225
+translate malay start_f8e3867b:
+
+    # e "Of course. We'll keep things quiet, just the two of us talking."
+    e "Sudah tentu. Kita akan kekalkan suasana sunyi, hanya kita berdua berbual."
+
+# game/script.rpy:1273
+translate malay start_5dd4e789:
+
+    # e "[bridge_line!t]"
+    e "[bridge_line!t]"
+
+# game/script.rpy:1285
+translate malay start_c7b95c74:
+
+    # e "[response_line!t]"
+    e "[response_line!t]"
+
+# game/script.rpy:1295
+translate malay start_c7b95c74_1:
+
+    # e "[response_line!t]"
+    e "[response_line!t]"
+
+# game/script.rpy:1305
+translate malay start_c7b95c74_2:
+
+    # e "[response_line!t]"
+    e "[response_line!t]"
+
+# game/script.rpy:1315
+translate malay start_c7b95c74_3:
+
+    # e "[response_line!t]"
+    e "[response_line!t]"
+
+# game/script.rpy:1322
+translate malay start_5dd4e789_1:
+
+    # e "[bridge_line!t]"
+    e "[bridge_line!t]"
+
+# game/script.rpy:1334
+translate malay start_c7b95c74_4:
+
+    # e "[response_line!t]"
+    e "[response_line!t]"
+
+# game/script.rpy:1344
+translate malay start_c7b95c74_5:
+
+    # e "[response_line!t]"
+    e "[response_line!t]"
+
+# game/script.rpy:1354
+translate malay start_c7b95c74_6:
+
+    # e "[response_line!t]"
+    e "[response_line!t]"
+
+# game/script.rpy:1364
+translate malay start_c7b95c74_7:
+
+    # e "[response_line!t]"
+    e "[response_line!t]"
+
+# game/script.rpy:1371
+translate malay start_5dd4e789_2:
+
+    # e "[bridge_line!t]"
+    e "[bridge_line!t]"
+
+# game/script.rpy:1387
+translate malay start_c7b95c74_8:
+
+    # e "[response_line!t]"
+    e "[response_line!t]"
+
+# game/script.rpy:1397
+translate malay start_c7b95c74_9:
+
+    # e "[response_line!t]"
+    e "[response_line!t]"
+
+# game/script.rpy:1407
+translate malay start_c7b95c74_10:
+
+    # e "[response_line!t]"
+    e "[response_line!t]"
+
+# game/script.rpy:1417
+translate malay start_c7b95c74_11:
+
+    # e "[response_line!t]"
+    e "[response_line!t]"
+
+# game/script.rpy:1542
+translate malay empathy_step_ae42f788:
+
+    # e "[line!t]"
+    e "[line!t]"
+
+# game/script.rpy:1639
+translate malay stress_input_756df8c9:
+
+    # e "[fillers_before[0]!t]"
+    e "[fillers_before[0]!t]"
+
+# game/script.rpy:1642
+translate malay stress_input_5dd4e789:
+
+    # e "[bridge_line!t]"
+    e "[bridge_line!t]"
+
+# game/script.rpy:1643
+translate malay stress_input_6e654e04:
+
+    # e "[q!t]"
+    e "[q!t]"
+
+# game/script.rpy:1652
+translate malay stress_input_c7b95c74:
+
+    # e "[response_line!t]"
+    e "[response_line!t]"
+
+# game/script.rpy:1660
+translate malay stress_input_c7b95c74_1:
+
+    # e "[response_line!t]"
+    e "[response_line!t]"
+
+# game/script.rpy:1668
+translate malay stress_input_c7b95c74_2:
+
+    # e "[response_line!t]"
+    e "[response_line!t]"
+
+# game/script.rpy:1676
+translate malay stress_input_c7b95c74_3:
+
+    # e "[response_line!t]"
+    e "[response_line!t]"
+
+# game/script.rpy:1796
+translate malay session_end_loop_8d122e79:
+
+    # e "We can continue with another coping exercise, or we can wrap up whenever you feel ready."
+    e "Kita boleh teruskan dengan latihan menenangkan yang lain, atau kita boleh berhenti bila-bila anda rasa bersedia."
+
+# game/script.rpy:1955
+translate malay affective_input_66304750:
+
+    # e "[fillers_before_aff[0]!t]"
+    e "[fillers_before_aff[0]!t]"
+
+# game/script.rpy:1958
+translate malay affective_input_5dd4e789:
+
+    # e "[bridge_line!t]"
+    e "[bridge_line!t]"
+
+# game/script.rpy:1959
+translate malay affective_input_6e654e04:
+
+    # e "[q!t]"
+    e "[q!t]"
+
+# game/script.rpy:1968
+translate malay affective_input_c7b95c74:
+
+    # e "[response_line!t]"
+    e "[response_line!t]"
+
+# game/script.rpy:1976
+translate malay affective_input_c7b95c74_1:
+
+    # e "[response_line!t]"
+    e "[response_line!t]"
+
+# game/script.rpy:1984
+translate malay affective_input_c7b95c74_2:
+
+    # e "[response_line!t]"
+    e "[response_line!t]"
+
+# game/script.rpy:1992
+translate malay affective_input_c7b95c74_3:
+
+    # e "[response_line!t]"
+    e "[response_line!t]"
+
+# game/script.rpy:2222
+translate malay post_response_fc04f621:
+
+    # e "[feedback_prompt!t]"
+    e "[feedback_prompt!t]"
+
+# game/script.rpy:2255
+translate malay post_response_d826821c:
+
+    # e "[fb_close!t] [user_name]."
+    e "[fb_close!t] [user_name]."
+
+# game/script.rpy:2259
+translate malay post_response_26e3bcc2:
+
+    # e "[fb_close!t]"
+    e "[fb_close!t]"
+
+# game/script.rpy:2263
+translate malay post_response_26e3bcc2_1:
+
+    # e "[fb_close!t]"
+    e "[fb_close!t]"
+
+# game/script.rpy:2385
+translate malay calming_loop_2386b60c:
+
+    # e "[exit_msg!t]"
+    e "[exit_msg!t]"
+
+# game/script.rpy:2395
+translate malay calming_loop_3d318e28:
+
+    # e "[calm_close!t]"
+    e "[calm_close!t]"
+
+# game/script.rpy:2408
+translate malay calming_loop_7441937b:
+
+    # e "[keep_going!t]"
+    e "[keep_going!t]"
+
+# game/script.rpy:2611
+translate malay phase5_close_update_621d6d49:
+
+    # e "[close_line!t]"
+    e "[close_line!t]"
+
+# game/script.rpy:2621
+translate malay phase5_close_update_621d6d49_1:
+
+    # e "[close_line!t]"
+    e "[close_line!t]"
+
+# game/script.rpy:2634
+translate malay phase5_close_update_621d6d49_2:
+
+    # e "[close_line!t]"
+    e "[close_line!t]"
+
+translate malay strings:
+
+    # game/script.rpy:1216
+    old "Yes, music would be nice"
+    new "Ya, saya mahu muzik"
+
+    # game/script.rpy:1222
+    old "No, I'd prefer quiet"
+    new "Tidak, saya lebih suka suasana sunyi"
+

@@ -299,10 +299,6 @@ init python:
             "total_interactions", "session_duration_minutes", "end_action",
             "stress_level", "empathy_mode", "intention_level", "empathy_E", "support_need_announced"
         ]
-        # Write the session summary. If the main file can't be opened for append
-        # (most commonly because it is open in Excel, or OneDrive is mid-sync),
-        # fall back to a sidecar file so a session summary is NEVER silently lost.
-        # Pending rows can be merged back into the main CSV later.
         pending_path = os.path.join(DROPBOX_LOG_DIR, "session_summaries_pending.csv")
         for target in (log_path, pending_path):
             try:
@@ -345,6 +341,7 @@ init python:
             "last_technique": None,
             "last_end_action": "",
             "support_need_announced": False,
+            "music_enabled": None,  # None = never asked; True/False = saved preference
         }
 
     def load_user_profile(name):
@@ -1095,7 +1092,6 @@ label hana_good_job:
 
 label start:
 
-    play music "audio/BGM/Hana_lofi.mp3" volume 0.3 fadein 3.0 loop
     scene black
     with fade
     centered "Disclaimer:\n\nThis session uses some questions from the Depression Anxiety Stress Scales (DASS), specifically the stress subscale. \
@@ -1143,8 +1139,13 @@ label start:
     $ prev_empathy_mode = user_profile.get("last_empathy_mode", "unknown")
     $ prev_intention_level = user_profile.get("last_intention_level", "unknown")
 
-    # guna dkt technique nnti nak avoid same user dpt technique sama 
+    # guna dkt technique nnti nak avoid same user dpt technique sama
     $ avoid_technique_first = prev_technique
+
+    # idea dr azizi mintak user preference if nk guna music ke tak
+    $ music_pref = user_profile.get("music_enabled", None)
+    if music_pref:
+        play music "audio/BGM/Hana_lofi.mp3" volume 0.3 fadein 3.0 loop
 
     # 2 flow (user baru or lama)
     if is_returning_user:
@@ -1200,7 +1201,30 @@ label start:
  
                 e "Hi. It's okay if you're not sure what to say. We can take things one step at a time."
 
-    # intro over — clear the dim overlay
+    # line mintak user nak music ke tak
+    if music_pref is None:
+        show hana smiling at hana_pos
+        with Fade(0.3, 0.0, 0.3)
+        e "Before we continue, would you like some soft background music while we talk?"
+        e "Some people find it relaxing, and others prefer quiet. Either is completely fine."
+
+        menu:
+            "Yes, music would be nice":
+                $ music_pref = True
+                show hana smiling at hana_pos
+                e "Alright. I'll keep it gentle in the background."
+                play music "audio/BGM/Hana_lofi.mp3" volume 0.2 fadein 3.0 loop
+
+            "No, I'd prefer quiet":
+                $ music_pref = False
+                show hana neutral at hana_pos
+                e "Of course. We'll keep things quiet, just the two of us talking."
+
+        $ user_profile = save_user_profile(user_name, {"music_enabled": music_pref})
+        $ log_interaction(session_filename, session_id,
+                          "Music preference", "music_on" if music_pref else "music_off",
+                          None, None, Ea, Ec, Ad, Be, None, None, "preference")
+
     hide black
     with Dissolve(0.5)
 
@@ -1239,7 +1263,7 @@ label start:
     call empathy_step("How have you been feeling today?", ans, s_in, "checkin_q1", speak=False) from _checkin_q1
 
     show hana listening at hana_center_listen
-    # Bridge back to the previous answer so HANA feels like she's following along.
+    # function nak refer ans q1 tadi ikut flow
     $ bridge_line = hana_bridge(level_from_s_in(checkin_s_in_history[-1]))
     e "[bridge_line!t]"
     e "How has your day been so far?"
@@ -1815,6 +1839,8 @@ label session_end_loop:
                     )
                     call calming_loop from _session_end_calming_loop
                     $ calming_done = True
+                    if not feedback_given:
+                        call post_response(last_empathy_mode) from _guided_post_response
                     call phase5_close_update("guided") from _phase5_after_guided
                     $ session_done = True
 
@@ -1849,6 +1875,8 @@ label session_end_loop:
                     )
                     call calming_loop from _session_end_calming_loop_ms
                     $ calming_done = True
+                    if not feedback_given:
+                        call post_response(last_empathy_mode) from _guided_post_response_ms
                     call phase5_close_update("guided") from _phase5_after_guided_ms
                     $ session_done = True
 
@@ -2177,8 +2205,6 @@ label affective_input:
             show hana listening at hana_center_listen
             e "I'm right here with you, [user_name]."
 
-    # The post-response "was that helpful?" check now lives inside the
-    # calming section (calming_loop), so it is no longer called here.
     show hana listening at hana_center_listen
     return
 
