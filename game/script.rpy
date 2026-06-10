@@ -2506,7 +2506,7 @@ label deliver_technique(tech):
 
     elif tech == "reflection":
         show beachscene at scene_right
-        show hana thinking at hana_left
+        show hana neutral at hana_left
         e "Let's try a guided imagery exercise."
         e "Guided imagery involves imagining a calm and peaceful place in as much detail as possible."
         e "Many people find it helpful for slowing down and creating a sense of calm during stressful moments."
