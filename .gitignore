@@ -1,0 +1,26 @@
+# --- Ren'Py generated / volatile ---
+# Compiled bytecode (regenerated from .rpy source)
+*.rpyc
+*.rpyb
+*.rpymc
+
+# Save games and runtime cache
+/game/saves/
+/game/cache/
+
+# Editor/backup leftovers
+*.bak
+
+# --- Ren'Py runtime logs ---
+/log.txt
+/errors.txt
+/traceback.txt
+
+# --- Session log data (runtime-generated) ---
+/logs/
+
+# --- Python / OS ---
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db

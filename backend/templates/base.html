@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}HANA Admin{% endblock %}</title>
+    <style>
+        :root {
+            --bg: #11141b; --panel: #1b2030; --panel2: #232a3d;
+            --ink: #e7ebf3; --muted: #9aa3b8; --accent: #7aa2ff;
+            --line: #2c3450; --good: #4ec98a; --bad: #ff7a7a;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; background: var(--bg); color: var(--ink);
+            font: 15px/1.5 system-ui, "Segoe UI", Roboto, sans-serif;
+        }
+        a { color: var(--accent); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        header {
+            display: flex; align-items: center; gap: 22px;
+            padding: 14px 28px; background: var(--panel);
+            border-bottom: 1px solid var(--line); position: sticky; top: 0;
+        }
+        header .brand { font-weight: 700; font-size: 18px; letter-spacing: .3px; }
+        header nav a { color: var(--muted); margin-right: 6px; }
+        header nav a:hover { color: var(--ink); }
+        header .spacer { flex: 1; }
+        main { padding: 26px 28px; max-width: 1300px; margin: 0 auto; }
+        h1 { font-size: 22px; margin: 0 0 18px; }
+        h2 { font-size: 17px; margin: 26px 0 10px; color: var(--muted); }
+        .cards { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 22px; }
+        .card {
+            background: var(--panel); border: 1px solid var(--line);
+            border-radius: 12px; padding: 16px 20px; min-width: 150px;
+        }
+        .card .n { font-size: 28px; font-weight: 700; }
+        .card .l { color: var(--muted); font-size: 13px; }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th, td {
+            text-align: left; padding: 9px 12px;
+            border-bottom: 1px solid var(--line); vertical-align: top;
+        }
+        th { color: var(--muted); font-weight: 600; }
+        tbody tr:hover { background: var(--panel2); }
+        .panel {
+            background: var(--panel); border: 1px solid var(--line);
+            border-radius: 12px; overflow: hidden;
+        }
+        .tag {
+            display: inline-block; padding: 1px 8px; border-radius: 20px;
+            background: var(--panel2); color: var(--muted); font-size: 12px;
+        }
+        .mono { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: 12px; }
+        .q { color: var(--accent); }
+        .a { color: var(--ink); }
+        .empty { color: var(--muted); padding: 30px; text-align: center; }
+        .btn {
+            display: inline-block; padding: 8px 14px; border-radius: 8px;
+            background: var(--accent); color: #0b0e16; font-weight: 600;
+            border: none; cursor: pointer;
+        }
+        form.login {
+            max-width: 340px; margin: 90px auto; background: var(--panel);
+            border: 1px solid var(--line); border-radius: 14px; padding: 28px;
+        }
+        form.login input {
+            width: 100%; padding: 11px 12px; margin: 10px 0 16px;
+            border-radius: 8px; border: 1px solid var(--line);
+            background: var(--bg); color: var(--ink);
+        }
+        .err { color: var(--bad); margin-bottom: 8px; }
+        .crumbs { color: var(--muted); margin-bottom: 14px; font-size: 13px; }
+    </style>
+</head>
+<body>
+    {% if session.get('admin') %}
+    <header>
+        <span class="brand">🌸 HANA Admin</span>
+        <nav>
+            <a href="{{ url_for('dashboard') }}">Users</a>
+            <a href="{{ url_for('summaries') }}">Summaries</a>
+            <a href="{{ url_for('export_interactions') }}">⬇ Interactions CSV</a>
+            <a href="{{ url_for('export_summaries') }}">⬇ Summaries CSV</a>
+        </nav>
+        <span class="spacer"></span>
+        <a href="{{ url_for('logout') }}">Log out</a>
+    </header>
+    {% endif %}
+    <main>
+        {% block body %}{% endblock %}
+    </main>
+</body>
+</html>

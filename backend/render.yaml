@@ -1,0 +1,28 @@
+# Render.com blueprint. Push the `backend/` folder to a Git repo and
+# "New > Blueprint" pointing at this file, OR create a Web Service manually
+# with the build/start commands below.
+#
+# NOTE: Render's free tier has an EPHEMERAL filesystem — the SQLite file is
+# wiped on every redeploy/restart. A persistent disk is attached below so logs
+# survive. (A disk requires a paid instance type; on free, prefer PythonAnywhere
+# for persistent SQLite — see README.md.)
+services:
+  - type: web
+    name: hana-backend
+    runtime: python
+    plan: starter            # change to "free" if you don't need the disk
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn wsgi:application
+    envVars:
+      - key: ADMIN_PASSWORD
+        sync: false          # set in the Render dashboard
+      - key: INGEST_TOKEN
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: HANA_DB_PATH
+        value: /var/data/hana.db
+    disk:
+      name: hana-data
+      mountPath: /var/data
+      sizeGB: 1

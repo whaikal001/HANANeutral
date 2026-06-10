@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Session {{ session_id }} — HANA Admin{% endblock %}
+{% block body %}
+<div class="crumbs">
+    <a href="{{ url_for('dashboard') }}">Users</a> /
+    <a href="{{ url_for('user_detail', device_id=device_id) }}">{{ name or device_id }}</a> /
+    {{ session_id }}
+</div>
+<h1>Interaction log <span class="tag mono">{{ session_id }}</span></h1>
+
+<div class="panel">
+    {% if rows %}
+    <table>
+        <thead><tr>
+            <th>Time</th><th>Question / event</th><th>Answer</th>
+            <th>Score</th><th>Stress</th>
+            <th>Ea</th><th>Ec</th><th>Ad</th><th>Be</th><th>D</th><th>Ep</th>
+            <th>Mode</th>
+        </tr></thead>
+        <tbody>
+        {% for r in rows %}
+            <tr>
+                <td class="mono">{{ r['client_ts'] }}</td>
+                <td class="q">{{ r['question'] }}</td>
+                <td class="a">{{ r['answer'] }}</td>
+                <td>{{ r['score'] if r['score'] is not none }}</td>
+                <td>{{ r['stress_level'] if r['stress_level'] is not none }}</td>
+                <td class="mono">{{ '%.3f'|format(r['Ea']) if r['Ea'] is not none }}</td>
+                <td class="mono">{{ '%.3f'|format(r['Ec']) if r['Ec'] is not none }}</td>
+                <td class="mono">{{ '%.3f'|format(r['Ad']) if r['Ad'] is not none }}</td>
+                <td class="mono">{{ '%.3f'|format(r['Be']) if r['Be'] is not none }}</td>
+                <td class="mono">{{ '%.3f'|format(r['D']) if r['D'] is not none }}</td>
+                <td class="mono">{{ '%.3f'|format(r['Ep']) if r['Ep'] is not none }}</td>
+                <td>{{ r['empathy_mode'] }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty">No rows for this session.</div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Summaries — HANA Admin{% endblock %}
+{% block body %}
+<h1>Session summaries</h1>
+<div class="panel">
+    {% if rows %}
+    <table>
+        <thead><tr>
+            <th>Received</th><th>User</th><th>Session</th>
+            <th>Start</th><th>End</th><th>Δ</th><th>Calm</th>
+            <th>Modes</th><th>Techniques</th><th>Turns</th><th>Mins</th><th>End</th>
+            <th>Stress lvl</th><th>Empathy mode</th><th>Intention</th><th>E</th><th>Support</th>
+        </tr></thead>
+        <tbody>
+        {% for r in rows %}
+            <tr>
+                <td class="mono">{{ r['received_at'] }}</td>
+                <td><a href="{{ url_for('user_detail', device_id=r['device_id']) }}">{{ r['user_name'] or '(no name)' }}</a></td>
+                <td class="mono">{{ r['session_id'] }}</td>
+                <td>{{ r['start_stress_score'] }}</td>
+                <td>{{ r['end_stress_score'] }}</td>
+                <td>{{ r['stress_improvement'] }}</td>
+                <td>{{ r['final_calm_rating'] }}</td>
+                <td>{{ r['modes_used'] }}</td>
+                <td>{{ r['techniques_used'] }}</td>
+                <td>{{ r['total_interactions'] }}</td>
+                <td>{{ r['session_duration_minutes'] }}</td>
+                <td>{{ r['end_action'] }}</td>
+                <td>{{ r['stress_level'] }}</td>
+                <td>{{ r['empathy_mode'] }}</td>
+                <td>{{ r['intention_level'] }}</td>
+                <td>{{ r['empathy_E'] }}</td>
+                <td>{{ r['support_need_announced'] }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty">No session summaries yet.</div>
+    {% endif %}
+</div>
+{% endblock %}
