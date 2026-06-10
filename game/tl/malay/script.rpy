@@ -1362,6 +1362,9 @@ translate malay strings:
     old "Much calmer / peaceful"
     new "Jauh lebih tenang / damai"
 
+    old "I'd like to stop here for now"
+    new "Saya nak berhenti di sini buat masa ini"
+
 # TODO: Translation updated at 2026-06-10 08:24
 
 # game/script.rpy:1570

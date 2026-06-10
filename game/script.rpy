@@ -427,6 +427,33 @@ init python:
 
         renpy.restart_interaction()
 
+    def cleanup_unfinished_profile_slots():
+        # A slot gets its name as soon as the user types it in-game, but
+        # visit_count only increments when a session completes (phase5).
+        # A named slot with 0 visits is an abandoned first session - reset it
+        # so it shows up as a fresh slot again.
+        slot_store = getattr(persistent, "hana_profile_slots", None) or {}
+        profile_store = getattr(persistent, "hana_user_memory", None) or {}
+        changed = False
+
+        for i in range(1, PROFILE_SLOT_COUNT + 1):
+            key = profile_slot_key(i)
+            slot = slot_store.get(key)
+            if not slot:
+                continue
+            name = (slot.get("name", "") or "").strip()
+            if name and slot.get("visit_count", 0) <= 0:
+                pkey = profile_key_for(name)
+                # only drop the user memory if it also never completed a session
+                if pkey in profile_store and profile_store[pkey].get("visit_count", 0) <= 0:
+                    del profile_store[pkey]
+                del slot_store[key]
+                changed = True
+
+        if changed:
+            persistent.hana_profile_slots = slot_store
+            persistent.hana_user_memory = profile_store
+
     def profile_slot_title(slot_index):
         dummy1, dummy2, slot = load_profile_slot(slot_index)
         name = slot.get("name", "").strip()
@@ -661,7 +688,27 @@ init python:
             return condition in ["Severe distress", "Extremely severe distress"]
         return calm_rating_value <= 2 and condition in ["Moderate distress", "Severe distress", "Extremely severe distress"]
 
+    def empathy_policy_weight(rule):
+        policy = getattr(persistent, "hana_empathy_policy", None) or {}
+        policy_key = "%s|%s|%s" % (rule.get("strategy", ""), rule.get("intensity", ""), rule.get("expression", ""))
+        return policy.get(policy_key, {}).get("weight", 0.0)
+
     def table_rule_for_condition(condition, urgent=False, repeated=False):
+        rule = base_table_rule_for_condition(condition, urgent=urgent, repeated=repeated)
+
+        # learned feedback adaptation: if this strategy has accumulated negative
+        # feedback for this user (weight <= -0.3 means 3+ net negative ratings),
+        # step down to the gentler adaptive moderated rule instead of repeating
+        # an approach that has not been helping. Urgent cases are never downgraded.
+        if not urgent and rule.get("tag") != "repeated_prolonged_distress":
+            if empathy_policy_weight(rule) <= -0.3:
+                gentler = base_table_rule_for_condition(condition, urgent=False, repeated=True)
+                gentler["tag"] = rule.get("tag", "") + "_policy_adjusted"
+                return gentler
+
+        return rule
+
+    def base_table_rule_for_condition(condition, urgent=False, repeated=False):
         if urgent:
             return {
                 "strategy": "Emergency empathic intervention",
@@ -910,6 +957,11 @@ init python:
             st.compassionate_score = 4
 
 
+# run once at launch so abandoned first-session profiles already read as
+# "New slot" on the profile selection screen
+init 999 python:
+    cleanup_unfinished_profile_slots()
+
 default support_need_announced = False
 default compassion_cooldown_steps = 0
 default last_calm_rating = None
@@ -1054,6 +1106,8 @@ label start:
         alpha 0.6
     with fade
 #ni critical part if error sume tak jalan
+    # clear out profiles abandoned mid-first-session so they read as new slots
+    $ cleanup_unfinished_profile_slots()
     $ session_id = generate_session_id()
     $ session_filename = make_session_filename()
     $ reset_empathy_parameters()
@@ -1082,6 +1136,9 @@ label start:
     $ is_returning_user = user_profile.get("visit_count", 0) > 0
     $ last_stress_level = user_profile.get("last_stress_level", "unknown")
     $ prev_calm_rating = user_profile.get("last_calm_rating", None)
+    # carry last visit's state forward so repeated_prolonged_distress_detected() can fire
+    $ last_calm_rating = prev_calm_rating
+    $ support_need_announced = user_profile.get("support_need_announced", False)
     $ prev_technique = user_profile.get("last_technique", None)
     $ prev_empathy_mode = user_profile.get("last_empathy_mode", "unknown")
     $ prev_intention_level = user_profile.get("last_intention_level", "unknown")
@@ -1666,8 +1723,14 @@ label stress_input:
     if last_empathy_mode not in modes_used_list:
         $ modes_used_list.append(last_empathy_mode)
 
-    # reactive path
-    if stress_level == "Extremely severe" or intention_level == "high" or Ad >= 0.5:
+    # user is entering a support path; remember it so a future visit with low calm
+    # ratings counts as repeated prolonged distress
+    if stress_level in ["Moderate", "Severe", "Extremely severe"]:
+        $ support_need_announced = True
+
+    # reactive path - only Extremely severe goes straight to calming;
+    # Severe escalates only when the empathy model also signals high urgency
+    if stress_level == "Extremely severe" or (stress_level == "Severe" and (intention_level == "high" or Ad >= 0.7)):
         show hana concerned high at hana_pos
         e "What you're carrying sounds really intense. If you ever feel unsafe, please reach out through Befrienders or talk to someone you trust."
         e "You do not have to handle this alone."
@@ -2236,10 +2299,12 @@ label calming_loop:
                 $ calm_rating = 5
                 $ s_in = 0.0
                 $ ans = "Much calmer"
-
-        $ last_calm_rating = calm_rating
+            "I'd like to stop here for now":
+                $ should_exit = True
+                $ ans = "I'd like to stop"
 
         if not should_exit:
+            $ last_calm_rating = calm_rating
             $ adapt_weights_from_feedback(calm_rating, s_in)
             $ signal = feedback_signal_from_rating(calm_rating)
             python:
@@ -2274,6 +2339,12 @@ label calming_loop:
         $ loop_count += 1
 
         if should_exit:
+            $ log_interaction(
+                session_filename, session_id,
+                "Calming loop ended (user stopped)", ans,
+                None, stress_level, Ea, Ec, Ad, Be, D, None,
+                "calming_loop_user_exit"
+            )
             show hana encouraging at hana_pos
             $ exit_msg = renpy.random.choice([
                 "That's okay. You tried, and that matters.",
@@ -2293,7 +2364,8 @@ label calming_loop:
             e "[calm_close!t]"
             show hana encouraging at hana_pos
             e "Hold onto that, [user_name]. Be gentle with yourself today."
-            call post_response(last_empathy_mode) from _calm_post_response_a
+            if not feedback_given:
+                call post_response(last_empathy_mode) from _calm_post_response_a
             return
         else:
             show hana encouraging at hana_pos
@@ -2317,7 +2389,8 @@ label calming_loop:
         calm_rating, stress_level, Ea, Ec, Ad, Be, D, None,
         "calming_loop_max_reached"
     )
-    call post_response(last_empathy_mode) from _calm_post_response_b
+    if not feedback_given:
+        call post_response(last_empathy_mode) from _calm_post_response_b
     return
 
 
