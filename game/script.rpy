@@ -1096,25 +1096,20 @@ label start:
         e "Welcome back, [user_name]."
         show hana warm high at hana_pos
         with Fade(0.3, 0.0, 0.3)
-        voice "audio/nicetoseeyouagain.mp3"
         e "It's nice to see you again."
         if last_stress_level in ["Moderate", "Severe", "Extremely severe"]:
             show hana concerned low at hana_pos
-            voice "audio/line1089.mp3"
             e "Last time, it seemed like things were quite heavy for you."
         else:
             show hana smiling at hana_pos
-            voice "audio/line1092.mp3"
             e "Last time, things seemed fairly manageable."
     else:
         
         show hana waving at hana_pos
-        voice "audio/imhana.mp3"
         e "Hi, I'm Hana."
         if not user_name:
             show hana listening at hana_center_listen
             with Fade(0.3, 0.0, 0.3)
-            voice "audio/andyouare.mp3"
             e "And you are..?"
             show hana smiling at hana_pos
             $ user_name = renpy.input("")
@@ -1124,29 +1119,28 @@ label start:
 
         show hana listening at hana_center_listen
         with Fade(0.3, 0.0, 0.3)
-        voice "audio/itsnicetomeetyou.mp3"
         e "It's nice to meet you, [user_name]."
         show hana smiling at hana_pos
         with Fade(0.3, 0.0, 0.3)
-        voice "audio/mynamemeans.mp3"
+
         e "My name means \"flower\" in Japanese and \"happiness\" in Arabic."
-        voice "audio/iliketothink.mp3"
+
         e "I like to think that's a reminder to bring a little kindness into every conversation."
-        voice "audio/itslovelytohave.mp3"
+
         e "It's lovely to have you here."
        
         menu:
             "Nice to meet you too, Hana.":
                 show hana warm high at hana_pos
-                voice "audio/thatsverykindofyou.mp3"
+ 
                 e "That's very kind of you to say. I'm happy to meet you too."
             "That's a really pretty name.":
                 show hana smiling at hana_pos
-                voice "audio/thankyou,ivealways.mp3"
+
                 e "Thank you. I've always been fond of it myself."
             "...Hi.":
                 show hana warm high at hana_pos
-                voice "audio/hi,itsokay.mp3"
+ 
                 e "Hi. It's okay if you're not sure what to say. We can take things one step at a time."
 
     # intro over — clear the dim overlay
@@ -1156,32 +1150,32 @@ label start:
  #greeting and check-in
 
     show hana listening at hana_center_listen
-    voice "audio/so,howhaveyou.mp3"
+
     e "So, [user_name], how have you been feeling today?"
     menu:
         "I'm feeling good":
             $ ans = "I'm feeling good"
             $ s_in = 0.0
             show hana smiling at hana_pos
-            voice "audio/thatswondefu.mp3"
+  
             e "That's wonderful to hear. I'm glad you're feeling good today."
         "Pretty okay overall":
             $ ans = "Pretty okay overall"
             $ s_in = 0.33
             show hana neutral at hana_pos
-            voice "audio/sometimesanordinary.mp3"
+
             e "Sometimes an ordinary day can be a good thing."
         "A bit stressed":
             $ ans = "A bit stressed"
             $ s_in = 0.67
             show hana concerned low at hana_pos
-            voice "audio/itsoundslikeyou.mp3"
+
             e "It sounds like you've had a few things weighing on your mind."
         "Really overwhelmed":
             $ ans = "Really overwhelmed"
             $ s_in = 1.0
             show hana concerned high at hana_pos
-            voice "audio/thatsoundslikealottocarry.mp3"
+
             e "That sounds like a lot to carry. Thank you for sharing that with me."
 
     $ checkin_s_in_history.append(s_in)
