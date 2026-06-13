@@ -40,8 +40,15 @@ SUMMARY_FIELDS = [
 
 def get_db():
     if "db" not in g:
-        g.db = sqlite3.connect(DB_PATH)
+        # timeout: wait up to 30s for a competing writer instead of hanging the
+        # (single, on PythonAnywhere) worker forever — SQLite locking over the
+        # host's network filesystem can stall under the client's retry storm.
+        g.db = sqlite3.connect(DB_PATH, timeout=30)
         g.db.row_factory = sqlite3.Row
+        # WAL lets the dashboard read while the game is writing, so reads don't
+        # block writes (and vice-versa).
+        g.db.execute("PRAGMA journal_mode=WAL")
+        g.db.execute("PRAGMA busy_timeout=30000")
     return g.db
 
 
@@ -53,7 +60,8 @@ def close_db(exc):
 
 
 def init_db():
-    db = sqlite3.connect(DB_PATH)
+    db = sqlite3.connect(DB_PATH, timeout=30)
+    db.execute("PRAGMA journal_mode=WAL")
     db.executescript(
         """
         CREATE TABLE IF NOT EXISTS interactions (
