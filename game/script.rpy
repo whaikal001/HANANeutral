@@ -62,6 +62,8 @@ transform hana_center:
     on show:
         alpha 0.0
         linear 0.3 alpha 1.0
+    on replace:
+        linear 0.15 alpha 1.0
     on hide:
         alpha 1.0
         linear 0.3 alpha 0.0
@@ -75,6 +77,8 @@ transform hana_transition:
     on show:
         alpha 0.0
         linear 0.3 alpha 1.0
+    on replace:
+        linear 0.15 alpha 1.0
     on hide:
         alpha 1.0
         linear 0.3 alpha 0.0
@@ -96,6 +100,8 @@ transform hana_center_listen:
     on show:
         alpha 0.0
         linear 0.3 alpha 1.0
+    on replace:
+        linear 0.15 alpha 1.0
     on hide:
         alpha 1.0
         linear 0.3 alpha 0.0
@@ -109,6 +115,8 @@ transform hana_left:
     on show:
         alpha 0.0
         linear 0.3 alpha 1.0
+    on replace:
+        linear 0.15 alpha 1.0
     on hide:
         alpha 1.0
         linear 0.3 alpha 0.0
@@ -121,6 +129,8 @@ transform hana_mid:
     on show:
         alpha 0.0
         linear 0.3 alpha 1.0
+    on replace:
+        linear 0.15 alpha 1.0
     on hide:
         alpha 1.0
         linear 0.3 alpha 0.0
@@ -133,6 +143,8 @@ transform hana_right:
     on show:
         alpha 0.0
         linear 0.3 alpha 1.0
+    on replace:
+        linear 0.15 alpha 1.0
     on hide:
         alpha 1.0
         linear 0.3 alpha 0.0
@@ -146,6 +158,8 @@ transform scene_right:
         alpha 0.0
         xoffset 80
         linear 0.6 alpha 1.0 xoffset 0
+    on replace:
+        linear 0.2 alpha 1.0 xoffset 0
     on hide:
         alpha 1.0
         linear 0.4 alpha 0.0 xoffset 80
@@ -249,9 +263,8 @@ init python:
                     ])
                 writer.writerow(row)
         except Exception:
-            pass  # never let local logging crash the game (e.g. read-only FS on mobile)
+            pass  
 
-        # Mirror to the admin backend (no-op when HANA_BACKEND_URL is unset).
         try:
             hana_sync_interaction(
                 session_id, session_filename, timestamp, question, answer,
@@ -425,10 +438,6 @@ init python:
         renpy.restart_interaction()
 
     def cleanup_unfinished_profile_slots():
-        # A slot gets its name as soon as the user types it in-game, but
-        # visit_count only increments when a session completes (phase5).
-        # A named slot with 0 visits is an abandoned first session - reset it
-        # so it shows up as a fresh slot again.
         slot_store = getattr(persistent, "hana_profile_slots", None) or {}
         profile_store = getattr(persistent, "hana_user_memory", None) or {}
         changed = False
@@ -952,22 +961,20 @@ init python:
             st.adaptive_score = 4
             st.cognitive_score = 4
             st.compassionate_score = 4
-
-
-# run once at launch so abandoned first-session profiles already read as
-# "New slot" on the profile selection screen
+# method nak clean menu function sebab nak bg main menu clear and bukan ingame
 init 999 python:
     cleanup_unfinished_profile_slots()
 
 default support_need_announced = False
 default compassion_cooldown_steps = 0
 default last_calm_rating = None
+default calm_rated_this_session = False
 default last_technique = None
-default calming_done = False  # True once a calming exercise has run, so session_end_loop won't re-offer one
-default feedback_given = False  # True once the user has given post-exercise feedback; session may only end after this
-default avoid_technique_first = None  # Technique to avoid offering first this session (personalised from last visit)
-default struggle_intensity = 0  # Bug Fix #3: Track struggle intensity (0-3)
-default mode_shift_reason = ""  # Bug Fix #3: Track why mode shifted
+default calming_done = False  
+default feedback_given = False  
+default avoid_technique_first = None  
+default struggle_intensity = 0  
+default mode_shift_reason = "" 
 default quick_menu = True
 
 # --- Characters ---
@@ -989,6 +996,9 @@ default stress_level_desc = "Normal"
 default Ea_history = []
 default Ad = 0.2
 default last_empathy_mode = "unknown"
+default day_impact = ""
+default routine_stress = ""
+default extra_weight = ""
 
 default turn_id = 0
 default feedback = 0.0
@@ -1102,7 +1112,7 @@ label start:
         alpha 0.6
     with fade
 #ni critical part if error sume tak jalan
-    # clear out profiles abandoned mid-first-session so they read as new slots
+    # nak clear slot yang session tak settle abis
     $ cleanup_unfinished_profile_slots()
     $ session_id = generate_session_id()
     $ session_filename = make_session_filename()
@@ -1117,6 +1127,7 @@ label start:
     $ techniques_used_list = []
     $ interaction_count = 0
     $ calming_done = False
+    $ calm_rated_this_session = False
     $ feedback_given = False
     $ session_start_time = datetime.datetime.now()
     $ selected_slot = clamp_range(hana_selected_profile_slot, 1, PROFILE_SLOT_COUNT)
@@ -1416,8 +1427,6 @@ label start:
     $ infer_screening_context(checkin_s_in_history)
 
     show hana listening at hana_center_listen
-    # Issue 1/5: hand straight off to stress_input via jump so every downstream
-    # branch can route explicitly (no dangling call frame to fall back through).
     jump stress_input
 
 label show_hana_empathy(empathy_mode, intention_level, stress_level, passive=False):
@@ -1684,7 +1693,6 @@ label stress_input:
     elif hi_count >= 1:
         show hana concerned low at hana_pos
         e "Thank you for answering those questions with me."
-        e "It sounds like some of these experiences have been affecting you."
         e "I feel like I have a better understanding of how things have been for you."
     else:
         show hana smiling at hana_pos
@@ -1701,8 +1709,11 @@ label stress_input:
     $ stress_scale = (raw_score / max_raw) if max_raw > 0 else 0.0
     $ stress_score = int(round(stress_scale * 42.0))
     $ S = stress_scale
-    $ session_start_stress = stress_score  # Capture initial stress for session summary
-    $ initial_stress_score = stress_score  # Also save as initial for reference
+    $ session_start_stress = stress_score  
+    $ initial_stress_score = stress_score  
+    $ prev_end_stress = user_profile.get("last_stress_score", None) if user_profile else None
+    if is_returning_user and prev_end_stress is not None:
+        $ session_start_stress = prev_end_stress
 
     if stress_score <= 14:
         $ stress_level = "Normal"
@@ -1746,14 +1757,10 @@ label stress_input:
     $ last_intention_level = rule.get("intensity_bucket", intention_level)
     if last_empathy_mode not in modes_used_list:
         $ modes_used_list.append(last_empathy_mode)
-
-    # user is entering a support path; remember it so a future visit with low calm
-    # ratings counts as repeated prolonged distress
     if stress_level in ["Moderate", "Severe", "Extremely severe"]:
         $ support_need_announced = True
 
-    # reactive path - only Extremely severe goes straight to calming;
-    # Severe escalates only when the empathy model also signals high urgency
+    # reactive path 
     if stress_level == "Extremely severe" or (stress_level == "Severe" and (intention_level == "high" or Ad >= 0.7)):
         show hana concerned high at hana_pos
         e "What you're carrying sounds really intense. If you ever feel unsafe, please reach out through Befrienders or talk to someone you trust."
@@ -1777,7 +1784,8 @@ label stress_input:
         jump session_end_loop
 
 
-# session end - explore guidance or close
+# option nk continue ke end
+
 label session_end_loop:
     $ hana_pos = pick_random_scene_pos()
     $ session_done = False
@@ -1897,99 +1905,133 @@ label session_end_loop:
 label affective_input:
     $ hana_pos = pick_random_scene_pos()
     show hana listening at hana_center_listen
-
     $ D = None
-
-    $ affective_questions = [
-        "How has this stress been affecting your day-to-day life recently?",
-        "Which parts of your routine have been feeling the most stressful lately?",
-        "Has anything in your life been adding extra weight lately?"
-    ]
-
     $ fillers_before_aff = [
         "I'd like to understand a little more about what has been contributing to these feelings.",
         "Thank you for continuing to share this with me.",
         "I appreciate you taking the time to reflect on these experiences."
     ]
-
-    $ affective_feedback_followup = {
-        0: [
-            "It sounds like that part has been fairly manageable.",
-            "That's good to hear.",
-            "It seems like that hasn't been weighing too heavily on you.",
-            "I'm glad that part feels a little easier."
-        ],
-        1: [
-            "That sounds understandable.",
-            "It seems like that comes and goes at times.",
-            "I can see how that might affect you occasionally.",
-            "It sounds like you've been managing it as best you can."
-        ],
-        2: [
-            "That sounds difficult to manage.",
-            "It seems like several things have been demanding your attention at once.",
-            "I can see how that would feel tiring over time.",
-            "That sounds like a lot to carry."
-        ],
-        3: [
-            "That sounds really difficult.",
-            "I'm sorry you've been carrying so much.",
-            "That seems like a heavy burden to hold for such a long time.",
-            "I can understand why that would feel overwhelming."
-        ]
-    }
-
     $ affective_responses = []
-    $ j = 0
+    $ hana_pos = pick_random_scene_pos()
+    show hana listening at hana_center_listen
+    e "[fillers_before_aff[0]!t]"
+    $ q = "How has this stress been affecting your day-to-day life recently?"
+    e "[q!t]"
 
-    while j < len(affective_questions):
-        $ q = affective_questions[j]
-        $ hana_pos = pick_random_scene_pos()
-        show hana listening at hana_center_listen
-        if j == 0:
-            e "[fillers_before_aff[0]!t]"
-        else:
-            $ bridge_line = hana_bridge(affective_responses[j-1])
-            e "[bridge_line!t]"
-        e "[q!t]"
+    menu:
+        "It has been hard to focus on daily tasks.":
+            $ day_impact = "focus"
+            $ ans = "Hard to focus on daily tasks"
+            $ aff_score = 1
+            show hana neutral at hana_pos
+            e "When stress affects your focus, even simple tasks can feel harder to complete."
 
-        menu:
-            "No, not really":
-                $ affective_responses.append(0)
-                $ ans = "Not really"
-                $ s_in = 0.0
-                show hana smiling at hana_pos
-                $ response_line = renpy.random.choice(affective_feedback_followup[0])
-                e "[response_line!t]"
+        "I feel mentally drained most of the time.":
+            $ day_impact = "drained"
+            $ ans = "Mentally drained most of the time"
+            $ aff_score = 3
+            show hana concerned high at hana_pos
+            e "Feeling mentally drained can make even ordinary tasks feel heavier than usual."
 
-            "A little stressful, but manageable":
-                $ affective_responses.append(1)
-                $ ans = "A little stressful"
-                $ s_in = 0.33
-                show hana neutral at hana_pos
-                $ response_line = renpy.random.choice(affective_feedback_followup[1])
-                e "[response_line!t]"
+        "I keep worrying even when I try to do other things.":
+            $ day_impact = "worry"
+            $ ans = "Keeps worrying during other things"
+            $ aff_score = 2
+            show hana concerned low at hana_pos
+            e "That kind of worry can stay in the background, even when you are trying to do other things."
 
-            "Several things feel stressful right now":
-                $ affective_responses.append(2)
-                $ ans = "Quite stressful"
-                $ s_in = 0.67
-                show hana concerned low at hana_pos
-                $ response_line = renpy.random.choice(affective_feedback_followup[2])
-                e "[response_line!t]"
+        "It has affected my sleep, rest, or mood.":
+            $ day_impact = "sleep_mood"
+            $ ans = "Affected sleep, rest, or mood"
+            $ aff_score = 3
+            show hana concerned high at hana_pos
+            e "When stress affects your sleep, rest, or mood, it can make the whole day feel heavier."
 
-            "A lot feels stressful for me at the moment":
-                $ affective_responses.append(3)
-                $ ans = "Very stressful"
-                $ s_in = 1.0
-                show hana concerned high at hana_pos
-                $ response_line = renpy.random.choice(affective_feedback_followup[3])
-                e "[response_line!t]"
+    $ affective_responses.append(aff_score)
+    $ s_in = aff_score / 3.0
+    call empathy_step(q, ans, s_in, "affective_followup_q1", speak=False) from _aff_followup_q1
 
-        call empathy_step(q, ans, s_in, "affective_followup_q" + str(j+1), speak=False) from _aff_followup_step
+    $ hana_pos = pick_random_scene_pos()
+    show hana listening at hana_center_listen
+    $ bridge_line = hana_bridge(affective_responses[0])
+    e "[bridge_line!t]"
+    $ q = "Which parts of your routine have been feeling the most stressful lately?"
+    e "[q!t]"
 
-        show hana listening at hana_center_listen
-        $ j += 1
+    menu:
+        "Balancing caregiving with work or study":
+            $ routine_stress = "balance"
+            $ ans = "Balancing caregiving with work or study"
+            $ aff_score = 2
+            show hana concerned low at hana_pos
+            e "Trying to balance caregiving with other responsibilities can become exhausting when everything needs your attention at once."
+
+        "Managing household tasks and caregiving":
+            $ routine_stress = "household"
+            $ ans = "Managing household tasks and caregiving"
+            $ aff_score = 2
+            show hana concerned low at hana_pos
+            e "Managing household tasks while caring for someone can make your routine feel overloaded."
+
+        "Finding time for myself":
+            $ routine_stress = "personal_time"
+            $ ans = "Finding time for myself"
+            $ aff_score = 1
+            show hana neutral at hana_pos
+            e "Not having enough time for yourself can slowly drain your energy."
+
+        "Handling unexpected caregiving needs":
+            $ routine_stress = "unexpected_needs"
+            $ ans = "Handling unexpected caregiving needs"
+            $ aff_score = 3
+            show hana concerned high at hana_pos
+            e "Unexpected caregiving needs can make the day feel unpredictable and difficult to manage."
+
+    $ affective_responses.append(aff_score)
+    $ s_in = aff_score / 3.0
+    call empathy_step(q, ans, s_in, "affective_followup_q2", speak=False) from _aff_followup_q2
+
+    $ hana_pos = pick_random_scene_pos()
+    show hana listening at hana_center_listen
+    $ bridge_line = hana_bridge(affective_responses[1])
+    e "[bridge_line!t]"
+    $ q = "Has anything in your life been adding extra weight lately?"
+    e "[q!t]"
+
+    menu:
+        "Worrying about the person I care for":
+            $ extra_weight = "care_recipient_worry"
+            $ ans = "Worrying about the person I care for"
+            $ aff_score = 2
+            show hana concerned low at hana_pos
+            e "Worrying about the person you care for can stay in the background, even when you are trying to focus on other things."
+
+        "Having too many responsibilities at once":
+            $ extra_weight = "too_many_responsibilities"
+            $ ans = "Having too many responsibilities at once"
+            $ aff_score = 3
+            show hana concerned high at hana_pos
+            e "Having too many responsibilities at once can make it feel like there is no space to breathe."
+
+        "Not getting enough rest or support":
+            $ extra_weight = "lack_of_rest_support"
+            $ ans = "Not getting enough rest or support"
+            $ aff_score = 3
+            show hana concerned high at hana_pos
+            e "Not getting enough rest or support can make caregiving feel even heavier."
+
+        "Something else":
+            $ extra_weight = "other"
+            $ ans = "Something else"
+            $ aff_score = 2
+            show hana concerned low at hana_pos
+            e "Even if it is difficult to explain, what you are carrying still matters."
+
+    $ affective_responses.append(aff_score)
+    $ s_in = aff_score / 3.0
+    call empathy_step(q, ans, s_in, "affective_followup_q3", speak=False) from _aff_followup_q3
+
+    show hana listening at hana_center_listen
 
     if len(affective_responses) > 0:
         $ S_affective = sum(affective_responses) / (3.0 * len(affective_responses))
@@ -2061,31 +2103,19 @@ label affective_input:
 
         if heavy_type == "balance":
             show hana concerned low at hana_pos
-            e "Trying to balance caregiving with everything else can be incredibly demanding."
-            show hana encouraging at hana_pos
-            e "It is not easy to meet so many responsibilites at once."
-            e "For now,let's focus on one small step at a time."
+            e "Trying to balance caregiving with everything else can be incredibly demanding. For now, let's focus on one small step at a time."
 
         elif heavy_type == "worry":
             show hana concerned low at hana_pos
-            e "Caring deeply about someone often comes with a lot of worry."
-
-            show hana encouraging at hana_pos
-            e "That concern shows how important they are to you."
-            e "Let's take a moment to slow down and breathe together."
+            e "Caring deeply about someone often comes with a lot of worry.Let's take a moment to slow down and breathe together."
 
         elif heavy_type == "exhaustion":
             show hana concerned low at hana_pos
-            e "It sounds like you've been giving a great deal of yourself for a long time."
-            show hana encouraging at hana_pos
-            e "Feeling exhausted does not mean you have failed."
-            e "It may simply be a sign that you have been carrying a lot."
+            e "It sounds like you've been giving a great deal of yourself for a long time.It may simply be a sign that you have been carrying a lot."
+
         else:
             show hana concerned low at hana_pos
-            e "Even if it's difficult to put into words, what you're feeling is still important."
-            show hana encouraging at hana_pos
-            e "You do not need to have all the answers right now."
-            e "We can simply take things one step at a time."
+            e "Even if it's difficult to put into words, what you're feeling is still important.We can simply take things one step at a time."
 
         $ Be = update_belief(Be, S_affective, Ec)
         $ D = desire(Be)
@@ -2144,34 +2174,6 @@ label affective_input:
                 "Empathy activation", intention_type,
                 stress_score, stress_level_desc, Ea, Ec, Ad, Be, D, Ep, intention_type
             )
-            if heavy_type == "balance":
-                show hana concerned low at hana_pos
-                e "Trying to balance caregiving with everything else can be incredibly demanding."
-                show hana encouraging at hana_pos
-                e "It is not easy to meet so many responsibilites at once."
-                e "For now,let's focus on one small step at a time."
-
-            elif heavy_type == "worry":
-                show hana concerned low at hana_pos
-                e "Caring deeply about someone often comes with a lot of worry."
-
-                show hana encouraging at hana_pos
-                e "That concern shows how important they are to you."
-                e "Let's take a moement to slow down and breathe together."
-
-            elif heavy_type == "exhaustion":
-                show hana concerned low at hana_pos
-                e "It sounds like you've been giving a great deal of yourself for a long time."
-                show hana encouraging at hana_pos
-                e "Feeling exhausted does not mean you have failed."
-                e "It may simply be a sign that you have been carrying a lot."
-            else:
-                show hana concerned low at hana_pos
-                e "Even if it's difficult to put into words, what you're feeling is still important."
-                show hana encouraging at hana_pos
-                e "You do not need to have all the answers right now."
-                e "We can simply take things one step at a time."
-
             call calming_loop from _comp_calming_loop
             $ calming_done = True
 
@@ -2331,6 +2333,7 @@ label calming_loop:
 
         if not should_exit:
             $ last_calm_rating = calm_rating
+            $ calm_rated_this_session = True
             $ adapt_weights_from_feedback(calm_rating, s_in)
             $ signal = feedback_signal_from_rating(calm_rating)
             python:
@@ -2505,6 +2508,7 @@ label deliver_technique(tech):
         e "Sometimes small positive moments deserve a little more attention than we usually give them."
 
     elif tech == "reflection":
+        stop music fadeout 2.0
         show beachscene at scene_right
         show hana neutral at hana_left
         e "Let's try a guided imagery exercise."
@@ -2526,6 +2530,8 @@ label deliver_technique(tech):
         e "Allow yourself to stay in this peaceful place for a few moments."
         e "Whenever things begin to feel overwhelming, you can return to this image and give yourself a moment to pause."
         hide beachscene
+        if music_pref:
+            play music "audio/BGM/Hana_lofi.mp3" volume 0.2 fadein 3.0 loop
 
     return
 
@@ -2549,11 +2555,18 @@ label phase5_close_update(end_action):
         session_end_time = datetime.datetime.now()
         session_duration = (session_end_time - session_start_time).total_seconds() / 60.0
         calm_residual_factor = {1: 1.0, 2: 0.8, 3: 0.6, 4: 0.35, 5: 0.15}
-        if last_calm_rating is not None:
+        # End stress comes from this session's measured stress (the screening),
+        # not the carried-over start, so a returning user's stress can end
+        # higher OR lower than where their previous session left off.
+        end_baseline = initial_stress_score if initial_stress_score else session_start_stress
+        if calm_rated_this_session and last_calm_rating is not None:
             residual = calm_residual_factor.get(last_calm_rating, 1.0)
-            session_end_stress = int(round(session_start_stress * residual))
+            session_end_stress = int(round(end_baseline * residual))
         else:
-            session_end_stress = session_start_stress
+            # No calming rating was given this session, so this session's
+            # measured (screening) stress stands as the end state. A stale
+            # rating carried in from a previous visit must not be applied.
+            session_end_stress = end_baseline
 
         stress_improvement = session_start_stress - session_end_stress
 

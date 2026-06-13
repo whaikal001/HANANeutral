@@ -99,7 +99,8 @@ def init_db():
             empathy_mode             TEXT,
             intention_level          TEXT,
             empathy_E                TEXT,
-            support_need_announced   TEXT
+            support_need_announced   TEXT,
+            attempts                 INTEGER DEFAULT 1
         );
 
         CREATE INDEX IF NOT EXISTS idx_inter_device  ON interactions(device_id);
@@ -116,6 +117,8 @@ def init_db():
                 "empathy_E", "support_need_announced"):
         if col not in existing_cols:
             db.execute("ALTER TABLE summaries ADD COLUMN %s TEXT" % col)
+    if "attempts" not in existing_cols:
+        db.execute("ALTER TABLE summaries ADD COLUMN attempts INTEGER DEFAULT 1")
 
     db.commit()
     db.close()
@@ -178,30 +181,57 @@ def api_summary():
 
     data = request.get_json(silent=True) or {}
     db = get_db()
-    db.execute(
-        """
-        INSERT INTO summaries
-            (device_id, user_name, session_id, session_file, client_ts,
-             start_stress_score, end_stress_score, stress_improvement,
-             final_calm_rating, modes_used, techniques_used,
-             total_interactions, session_duration_minutes, end_action,
-             stress_level, empathy_mode, intention_level, empathy_E,
-             support_need_announced)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
-        """,
-        (
-            data.get("device_id"), data.get("user_name"), data.get("session_id"),
-            data.get("session_file"), data.get("client_ts"),
-            _s(data.get("start_stress_score")), _s(data.get("end_stress_score")),
-            _s(data.get("stress_improvement")), _s(data.get("final_calm_rating")),
-            data.get("modes_used"), data.get("techniques_used"),
-            _s(data.get("total_interactions")), _s(data.get("session_duration_minutes")),
-            data.get("end_action"),
-            data.get("stress_level"), data.get("empathy_mode"),
-            data.get("intention_level"), _s(data.get("empathy_E")),
-            _s(data.get("support_need_announced")),
-        ),
+
+    fields = (
+        data.get("session_id"), data.get("session_file"), data.get("client_ts"),
+        _s(data.get("start_stress_score")), _s(data.get("end_stress_score")),
+        _s(data.get("stress_improvement")), _s(data.get("final_calm_rating")),
+        data.get("modes_used"), data.get("techniques_used"),
+        _s(data.get("total_interactions")), _s(data.get("session_duration_minutes")),
+        data.get("end_action"),
+        data.get("stress_level"), data.get("empathy_mode"),
+        data.get("intention_level"), _s(data.get("empathy_E")),
+        _s(data.get("support_need_announced")),
     )
+
+    # One row per participant: a repeat attempt from the same device + name
+    # overwrites the previous summary (keeping an attempt count) instead of
+    # adding a new row, so exports stay one-row-per-user.
+    existing = db.execute(
+        "SELECT id, attempts FROM summaries WHERE device_id = ? AND user_name = ?",
+        (data.get("device_id"), data.get("user_name")),
+    ).fetchone()
+
+    if existing:
+        db.execute(
+            """
+            UPDATE summaries SET
+                received_at = datetime('now'),
+                session_id = ?, session_file = ?, client_ts = ?,
+                start_stress_score = ?, end_stress_score = ?, stress_improvement = ?,
+                final_calm_rating = ?, modes_used = ?, techniques_used = ?,
+                total_interactions = ?, session_duration_minutes = ?, end_action = ?,
+                stress_level = ?, empathy_mode = ?, intention_level = ?, empathy_E = ?,
+                support_need_announced = ?,
+                attempts = ?
+            WHERE id = ?
+            """,
+            fields + ((existing["attempts"] or 1) + 1, existing["id"]),
+        )
+    else:
+        db.execute(
+            """
+            INSERT INTO summaries
+                (device_id, user_name, session_id, session_file, client_ts,
+                 start_stress_score, end_stress_score, stress_improvement,
+                 final_calm_rating, modes_used, techniques_used,
+                 total_interactions, session_duration_minutes, end_action,
+                 stress_level, empathy_mode, intention_level, empathy_E,
+                 support_need_announced, attempts)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,1)
+            """,
+            (data.get("device_id"), data.get("user_name")) + fields,
+        )
     db.commit()
     return jsonify(ok=True)
 

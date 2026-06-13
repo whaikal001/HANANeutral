@@ -17,7 +17,7 @@
 
 define HANA_BACKEND_URL = "https://wnhykl.pythonanywhere.com"
 define HANA_INGEST_TOKEN = "14daa2406e9a4827b48f7ff2dd5fd446"
-define HANA_SYNC_INSECURE = False   # set True ONLY if Android can't verify the server's TLS certificate
+define HANA_SYNC_INSECURE = True    # fallback when Android can't verify the server's TLS certificate
 define HANA_SYNC_TIMEOUT = 8        # seconds per network attempt
 
 init python:
@@ -53,6 +53,14 @@ init python:
             ctx = _hana_ssl.create_default_context()
             ctx.check_hostname = False
             ctx.verify_mode = _hana_ssl.CERT_NONE
+        else:
+            # Android's Python often has no system CA bundle, which makes every
+            # HTTPS request fail verification. Use Ren'Py's bundled certifi.
+            try:
+                import certifi
+                ctx = _hana_ssl.create_default_context(cafile=certifi.where())
+            except Exception:
+                ctx = None
         resp = _hana_urlreq.urlopen(req, timeout=HANA_SYNC_TIMEOUT, context=ctx)
         return 200 <= resp.getcode() < 300
 

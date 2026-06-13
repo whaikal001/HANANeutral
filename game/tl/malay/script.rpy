@@ -1761,3 +1761,161 @@ translate malay strings:
     old "No, I'd prefer quiet"
     new "Tidak, saya lebih suka suasana sunyi"
 
+# TODO: Translation updated at 2026-06-13 01:25
+
+# game/script.rpy:1910
+translate malay affective_input_ee88d55a:
+
+    # e "When stress affects your focus, even simple tasks can feel harder to complete."
+    e "Apabila tekanan mengganggu tumpuan, tugasan yang mudah pun boleh terasa lebih sukar untuk diselesaikan."
+
+# game/script.rpy:1917
+translate malay affective_input_b3447f1e:
+
+    # e "Feeling mentally drained can make even ordinary tasks feel heavier than usual."
+    e "Apabila mental terasa letih, tugasan harian yang biasa pun boleh terasa lebih berat daripada selalunya."
+
+# game/script.rpy:1924
+translate malay affective_input_eacc9b3f:
+
+    # e "That kind of worry can stay in the background, even when you are trying to do other things."
+    e "Kebimbangan seperti itu boleh terus bermain di fikiran, walaupun anda sedang cuba melakukan perkara lain."
+
+# game/script.rpy:1931
+translate malay affective_input_f8584d53:
+
+    # e "When stress affects your sleep, rest, or mood, it can make the whole day feel heavier."
+    e "Apabila tekanan menjejaskan tidur, rehat, atau emosi anda, sepanjang hari boleh terasa lebih berat."
+
+# game/script.rpy:1942
+translate malay affective_input_6e654e04_1:
+
+    # e "[q!t]"
+    e "[q!t]"
+
+# game/script.rpy:1950
+translate malay affective_input_a33b7708:
+
+    # e "Trying to balance caregiving with other responsibilities can become exhausting when everything needs your attention at once."
+    e "Cuba mengimbangi tugas penjagaan dengan tanggungjawab lain boleh menjadi sangat memenatkan apabila semuanya memerlukan perhatian anda serentak."
+
+# game/script.rpy:1957
+translate malay affective_input_e2c5650b:
+
+    # e "Managing household tasks while caring for someone can make your routine feel overloaded."
+    e "Menguruskan kerja rumah sambil menjaga seseorang boleh membuatkan rutin anda terasa terlalu sarat."
+
+# game/script.rpy:1964
+translate malay affective_input_0d373be7:
+
+    # e "Not having enough time for yourself can slowly drain your energy."
+    e "Apabila masa untuk diri sendiri tidak mencukupi, tenaga anda boleh susut sedikit demi sedikit."
+
+# game/script.rpy:1971
+translate malay affective_input_26c81638:
+
+    # e "Unexpected caregiving needs can make the day feel unpredictable and difficult to manage."
+    e "Keperluan penjagaan yang datang tanpa diduga boleh membuatkan hari anda terasa tidak menentu dan sukar diuruskan."
+
+# game/script.rpy:1980
+translate malay affective_input_5dd4e789_1:
+
+    # e "[bridge_line!t]"
+    e "[bridge_line!t]"
+
+# game/script.rpy:1982
+translate malay affective_input_6e654e04_2:
+
+    # e "[q!t]"
+    e "[q!t]"
+
+# game/script.rpy:1990
+translate malay affective_input_26226943:
+
+    # e "Worrying about the person you care for can stay in the background, even when you are trying to focus on other things."
+    e "Kebimbangan tentang orang yang anda jaga boleh terus bermain di fikiran, walaupun anda cuba menumpukan perhatian pada perkara lain."
+
+# game/script.rpy:1997
+translate malay affective_input_fee18632:
+
+    # e "Having too many responsibilities at once can make it feel like there is no space to breathe."
+    e "Memikul terlalu banyak tanggungjawab serentak boleh membuatkan anda terasa seperti tiada ruang untuk bernafas."
+
+# game/script.rpy:2004
+translate malay affective_input_1895ab1f:
+
+    # e "Not getting enough rest or support can make caregiving feel even heavier."
+    e "Kekurangan rehat atau sokongan boleh membuatkan tugas penjagaan terasa semakin berat."
+
+# game/script.rpy:2011
+translate malay affective_input_5f734967:
+
+    # e "Even if it is difficult to explain, what you are carrying still matters."
+    e "Walaupun sukar untuk diungkapkan, apa yang anda tanggung tetap penting."
+
+# game/script.rpy:2089
+translate malay affective_input_0896df6c:
+
+    # e "Trying to balance caregiving with everything else can be incredibly demanding. For now, let's focus on one small step at a time."
+    e "Mengimbangi tugas penjagaan dengan segala perkara lain memang sangat mencabar. Buat masa ini, mari kita fokus pada satu langkah kecil dahulu."
+
+# game/script.rpy:2093
+translate malay affective_input_efc755e3:
+
+    # e "Caring deeply about someone often comes with a lot of worry.Let's take a moment to slow down and breathe together."
+    e "Apabila kita benar-benar menyayangi seseorang, selalunya ia datang bersama banyak kebimbangan. Mari kita luangkan seketika untuk memperlahankan rentak dan bernafas bersama-sama."
+
+# game/script.rpy:2097
+translate malay affective_input_83e05a53:
+
+    # e "It sounds like you've been giving a great deal of yourself for a long time.It may simply be a sign that you have been carrying a lot."
+    e "Nampaknya anda telah banyak berkorban untuk sekian lama. Mungkin ia satu petanda bahawa anda telah menanggung terlalu banyak."
+
+# game/script.rpy:2101
+translate malay affective_input_26416bfa:
+
+    # e "Even if it's difficult to put into words, what you're feeling is still important.We can simply take things one step at a time."
+    e "Walaupun sukar untuk diluahkan dengan kata-kata, apa yang anda rasai tetap penting. Kita boleh hadapinya selangkah demi selangkah."
+
+translate malay strings:
+
+    # game/script.rpy:1905
+    old "It has been hard to focus on daily tasks."
+    new "Sukar untuk saya menumpukan perhatian pada tugasan harian."
+
+    # game/script.rpy:1912
+    old "I feel mentally drained most of the time."
+    new "Saya rasa letih mental hampir sepanjang masa."
+
+    # game/script.rpy:1919
+    old "I keep worrying even when I try to do other things."
+    new "Saya asyik bimbang walaupun cuba melakukan perkara lain."
+
+    # game/script.rpy:1926
+    old "It has affected my sleep, rest, or mood."
+    new "Ia menjejaskan tidur, rehat, atau emosi saya."
+
+    # game/script.rpy:1945
+    old "Balancing caregiving with work or study"
+    new "Mengimbangi tugas penjagaan dengan kerja atau pengajian"
+
+    # game/script.rpy:1952
+    old "Managing household tasks and caregiving"
+    new "Menguruskan kerja rumah dan tugas penjagaan"
+
+    # game/script.rpy:1959
+    old "Finding time for myself"
+    new "Mencari masa untuk diri sendiri"
+
+    # game/script.rpy:1966
+    old "Handling unexpected caregiving needs"
+    new "Menangani keperluan penjagaan yang tidak dijangka"
+
+    # game/script.rpy:1992
+    old "Having too many responsibilities at once"
+    new "Terlalu banyak tanggungjawab dalam satu masa"
+
+    # game/script.rpy:1999
+    old "Not getting enough rest or support"
+    new "Tidak mendapat rehat atau sokongan yang mencukupi"
+

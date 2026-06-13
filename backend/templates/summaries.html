@@ -6,7 +6,7 @@
     {% if rows %}
     <table>
         <thead><tr>
-            <th>Received</th><th>User</th><th>Session</th>
+            <th>Received</th><th>User</th><th>Session</th><th>Attempts</th>
             <th>Start</th><th>End</th><th>Δ</th><th>Calm</th>
             <th>Modes</th><th>Techniques</th><th>Turns</th><th>Mins</th><th>End</th>
             <th>Stress lvl</th><th>Empathy mode</th><th>Intention</th><th>E</th><th>Support</th>
@@ -17,6 +17,7 @@
                 <td class="mono">{{ r['received_at'] }}</td>
                 <td><a href="{{ url_for('user_detail', device_id=r['device_id']) }}">{{ r['user_name'] or '(no name)' }}</a></td>
                 <td class="mono">{{ r['session_id'] }}</td>
+                <td>{{ r['attempts'] }}</td>
                 <td>{{ r['start_stress_score'] }}</td>
                 <td>{{ r['end_stress_score'] }}</td>
                 <td>{{ r['stress_improvement'] }}</td>
