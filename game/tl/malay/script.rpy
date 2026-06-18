@@ -1,4 +1,4 @@
-﻿# TODO: Translation updated at 2026-06-08 18:29
+# TODO: Translation updated at 2026-06-08 18:29
 
 # game/script.rpy:1040
 translate malay start_a30eb804:
@@ -1371,91 +1371,91 @@ translate malay strings:
 translate malay stress_input_3dd3d9eb:
 
     # e "Let's take this gently, together."
-    e "Let's take this gently, together."
+    e "Mari kita lalui ini dengan lembut, bersama-sama."
 
 # game/script.rpy:1596
 translate malay conversation_loop_d0fb7c9e:
 
     # e "If you're comfortable with it, I'd like to understand a little more about how this has been affecting you."
-    e "If you're comfortable with it, I'd like to understand a little more about how this has been affecting you."
+    e "Jika anda selesa, saya ingin memahami dengan lebih lanjut bagaimana perkara ini mempengaruhi anda."
 
 # game/script.rpy:1605
 translate malay conversation_loop_36655b55:
 
     # e "Before we go on, would a short calming exercise help?"
-    e "Before we go on, would a short calming exercise help?"
+    e "Sebelum kita teruskan, adakah latihan menenangkan yang ringkas dapat membantu?"
 
 # game/script.rpy:1889
 translate malay affective_input_cd3e7689:
 
     # e "Let's take a moment to slow down and breathe together."
-    e "Let's take a moment to slow down and breathe together."
+    e "Mari kita luangkan sedikit masa untuk memperlahankan rentak dan bernafas bersama."
 
 # game/script.rpy:2015
 translate malay post_response_c1379e75:
 
     # e "Before we go on, I'd like to gently check in with you, [user_name]."
-    e "Before we go on, I'd like to gently check in with you, [user_name]."
+    e "Sebelum kita teruskan, saya ingin menyemak keadaan anda dengan lembut, [user_name]."
 
 # game/script.rpy:2016
 translate malay post_response_2c078659:
 
     # e "Compared to a moment ago, how are you feeling now?"
-    e "Compared to a moment ago, how are you feeling now?"
+    e "Berbanding sebentar tadi, bagaimana perasaan anda sekarang?"
 
 # game/script.rpy:2030
 translate malay post_response_38b48f33:
 
     # e "Thank you for being honest with me."
-    e "Thank you for being honest with me."
+    e "Terima kasih kerana jujur dengan saya."
 
 # game/script.rpy:2031
 translate malay post_response_91faf7bc:
 
     # e "Did that feel helpful?"
-    e "Did that feel helpful?"
+    e "Adakah itu terasa membantu?"
 
 # game/script.rpy:2067
 translate malay post_response_56b6091e:
 
     # e "I'm sorry this still feels heavy. Let's keep things gentle, [user_name]."
-    e "I'm sorry this still feels heavy. Let's keep things gentle, [user_name]."
+    e "Saya bersimpati keadaan ini masih terasa berat. Mari kita teruskan dengan lembut, [user_name]."
 
 # game/script.rpy:2070
 translate malay post_response_1af93c96:
 
     # e "I'm really glad that helped, even a little."
-    e "I'm really glad that helped, even a little."
+    e "Saya sungguh gembira ia membantu, walaupun sedikit."
 
 # game/script.rpy:2073
 translate malay post_response_3cf6ec0e:
 
     # e "Thank you. We'll go at a pace that feels right for you."
-    e "Thank you. We'll go at a pace that feels right for you."
+    e "Terima kasih. Kita akan melangkah mengikut kadar yang selesa untuk anda."
 
 # game/script.rpy:2077
 translate malay post_response_9bae26eb:
 
     # e "Would you like to keep talking, or shall we gently wrap up for today?"
-    e "Would you like to keep talking, or shall we gently wrap up for today?"
+    e "Adakah anda ingin terus berbual, atau kita tamatkan sesi hari ini dengan perlahan-lahan?"
 
 translate malay strings:
 
     # game/script.rpy:1612
     old "Not right now"
-    new "Not right now"
+    new "Tidak sekarang"
 
     # game/script.rpy:2019
     old "A little better"
-    new "A little better"
+    new "Sedikit lebih baik"
 
     # game/script.rpy:2022
     old "About the same"
-    new "About the same"
+    new "Lebih kurang sama"
 
     # game/script.rpy:2025
     old "Honestly, a bit worse"
-    new "Honestly, a bit worse"
+    new "Sejujurnya, sedikit lebih teruk"
 
     # game/script.rpy:2034
     old "Yes, it helped"
@@ -1467,11 +1467,11 @@ translate malay strings:
 
     # game/script.rpy:2079
     old "I'd like to keep talking"
-    new "I'd like to keep talking"
+    new "Saya ingin terus berbual"
 
     # game/script.rpy:2081
     old "Let's wrap up for today"
-    new "Let's wrap up for today"
+    new "Mari kita tamatkan untuk hari ini"
 
     old "I'd like to keep going a little longer"
     new "Saya ingin teruskan sebentar lagi"
@@ -1918,4 +1918,36 @@ translate malay strings:
     # game/script.rpy:1999
     old "Not getting enough rest or support"
     new "Tidak mendapat rehat atau sokongan yang mencukupi"
+
+# TODO: Translation updated at 2026-06-15 07:41
+
+# game/script.rpy:2122
+translate malay affective_input_5ec1dce5:
+
+    # e "Caring deeply about someone often comes with a lot of worry. Let's take a moment to slow down and breathe together."
+    e "Apabila kita benar-benar menyayangi seseorang, selalunya ia datang bersama banyak kebimbangan. Mari kita luangkan seketika untuk memperlahankan rentak dan bernafas bersama-sama."
+
+# game/script.rpy:2126
+translate malay affective_input_9a977bef:
+
+    # e "It sounds like you've been giving a great deal of yourself for a long time. It may simply be a sign that you have been carrying a lot."
+    e "Nampaknya anda telah banyak berkorban untuk sekian lama. Mungkin ia satu petanda bahawa anda telah menanggung terlalu banyak."
+
+# game/script.rpy:2130
+translate malay affective_input_e013df07:
+
+    # e "Even if it's difficult to put into words, what you're feeling is still important. We can simply take things one step at a time."
+    e "Walaupun sukar untuk diluahkan dengan kata-kata, apa yang anda rasai tetap penting. Kita boleh hadapinya selangkah demi selangkah."
+
+# game/script.rpy:2206
+translate malay affective_input_1b537a51:
+
+    # e "We can slow down whenever you need to."
+    e "Kita boleh perlahankan bila-bila masa anda perlukan."
+
+# game/script.rpy:2207
+translate malay affective_input_2ff909ba:
+
+    # e "Let's take things at a pace that feels comfortable for you."
+    e "Mari kita bergerak mengikut rentak yang selesa untuk anda."
 

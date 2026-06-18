@@ -1,24 +1,8 @@
-## HANA backend sync ###########################################################
-##
-## Silently mirrors every interaction log row and session summary to the admin
-## backend (see backend/), so all users' logs can be observed from the web
-## dashboard — including users on the Android build.
-##
-## SETUP (after deploying backend/ — see backend/README.md):
-##   1. Set HANA_BACKEND_URL to your deployed server, e.g.
-##         define HANA_BACKEND_URL = "https://yourname.pythonanywhere.com"
-##   2. Make HANA_INGEST_TOKEN match the backend's INGEST_TOKEN env var.
-##
-## Leave HANA_BACKEND_URL = "" to fully DISABLE syncing — the game then behaves
-## exactly as before, writing only the local CSV logs. Networking happens on a
-## background thread, so the game never blocks or crashes if the server is
-## unreachable; failed rows are queued in persistent data and retried on the
-## next launch.
-
-define HANA_BACKEND_URL = "https://wnhykl.pythonanywhere.com"
+define HANA_BACKEND_URL = "https://wanhaikal001.pythonanywhere.com"
 define HANA_INGEST_TOKEN = "14daa2406e9a4827b48f7ff2dd5fd446"
-define HANA_SYNC_INSECURE = True    # fallback when Android can't verify the server's TLS certificate
-define HANA_SYNC_TIMEOUT = 8        # seconds per network attempt
+define HANA_SYNC_INSECURE = True 
+define HANA_SYNC_TIMEOUT = 8        
+define HANA_APP_TYPE = "neutral"
 
 init python:
 
@@ -54,8 +38,6 @@ init python:
             ctx.check_hostname = False
             ctx.verify_mode = _hana_ssl.CERT_NONE
         else:
-            # Android's Python often has no system CA bundle, which makes every
-            # HTTPS request fail verification. Use Ren'Py's bundled certifi.
             try:
                 import certifi
                 ctx = _hana_ssl.create_default_context(cafile=certifi.where())
@@ -128,7 +110,10 @@ init python:
                               empathy_mode, extra=None):
         payload = {
             "device_id": hana_device_id(),
+            "app_type": HANA_APP_TYPE,
             "user_name": (getattr(renpy.store, "user_name", "") or ""),
+            "profile_id": getattr(renpy.store, "hana_active_profile_id", ""),
+            "profile_slot": getattr(renpy.store, "hana_selected_profile_slot", ""),
             "session_id": session_id,
             "session_file": session_file,
             "client_ts": timestamp,
@@ -155,7 +140,10 @@ init python:
             return v
         payload = {
             "device_id": hana_device_id(),
+            "app_type": HANA_APP_TYPE,
             "user_name": user_name or (getattr(renpy.store, "user_name", "") or ""),
+            "profile_id": getattr(renpy.store, "hana_active_profile_id", ""),
+            "profile_slot": getattr(renpy.store, "hana_selected_profile_slot", ""),
             "session_id": session_id,
             "session_file": session_file,
             "client_ts": timestamp,
@@ -175,15 +163,8 @@ init python:
             "support_need_announced": support_need_announced,
         }
         hana_enqueue("/api/summary", payload)
-
-    # The background sender and retry-replay are started in the init 999 block
-    # below, so the HANA_BACKEND_URL / token defines are guaranteed to be set.
-
-
+        
 init 999 python:
-
-    # Start the background sender (runs once at launch) and replay any rows that
-    # failed to send on a previous run (e.g. an offline session).
     try:
         _hana_thread = _hana_threading.Thread(target=_hana_worker, name="hana-sync", daemon=True)
         _hana_thread.start()
