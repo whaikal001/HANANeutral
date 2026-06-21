@@ -711,7 +711,7 @@ label start:
     if is_returning_user:
     
         show hana neutral at hana_pos
-        e "Welcome back, [user_name]."
+        e "Session resumed for[user_name]."
         show hana neutral at hana_pos
         with Fade(0.3, 0.0, 0.3)
         if last_stress_level in ["Moderate", "Severe", "Extremely severe"]:
@@ -721,7 +721,7 @@ label start:
     else:
         
         show hana neutral at hana_pos
-        e "Hi, I'm Hana."
+        e "This is Hana."
         if not user_name:
             show hana neutral at hana_pos
             with Fade(0.3, 0.0, 0.3)
@@ -734,7 +734,7 @@ label start:
 
         show hana neutral at hana_pos
         with Fade(0.3, 0.0, 0.3)
-        e "Hello, [user_name]."
+        e "User identified as [user_name]."
         show hana neutral at hana_pos
         with Fade(0.3, 0.0, 0.3)
 
@@ -744,15 +744,15 @@ label start:
             "Nice to meet you too, Hana.":
                 show hana neutral at hana_pos
  
-                e "Let's begin."
+                e "Input received. Beginning session."
             "That's a really pretty name.":
                 show hana neutral at hana_pos
 
-                e "Thank you. Let's begin."
+                e "Input received. Beginning session."
             "...Hi.":
                 show hana neutral at hana_pos
  
-                e "Alright. Let's begin."
+                e "Input received. Beginning session."
 
     # line mintak user nak music ke tak
     if music_pref is None:
@@ -785,7 +785,7 @@ label start:
 
     show hana neutral at hana_pos
 
-    e "So, [user_name], how have you been feeling today?"
+    e "Please select your current state today"
     menu:
         "I'm feeling good":
             $ ans = "I'm feeling good"
@@ -842,8 +842,8 @@ label start:
     call empathy_step("Did anything feel stressful or frustrating for you today?", ans, s_in, "checkin_q3", speak=False) from _checkin_q3
 
     show hana neutral at hana_pos
-    e "One more question before we continue."
-    e "What's something that has gone well for you recently?"
+    e "One more question."
+    e "Identify any recent positive event, if applicable."
     menu:
         "I accomplished something important":
             $ ans = "I accomplished something important"
@@ -931,7 +931,7 @@ label stress_input:
 
     $ hi_count = sum(1 for r in stress_responses if r >= 2)
     show hana neutral at hana_pos
-    e "Thank you for answering those questions."
+    e "Responses recorded."
 
     show hana neutral at hana_pos
 
@@ -976,7 +976,7 @@ label stress_input:
     # Extremely severe: provide safety information, then go to a calming exercise.
     if stress_level == "Extremely severe":
         show hana neutral at hana_pos
-        e "If you ever feel unsafe, contact Befrienders or a healthcare professional. You do not have to handle this alone."
+        e "If you ever feel unsafe, contact Befrienders or a healthcare professional. External support options are available."
         e "Let's start with a short calming exercise."
         call calming_loop from _reactive_calming_loop
         $ calming_done = True
@@ -985,7 +985,7 @@ label stress_input:
     # Moderate / Severe: identify the main stressors, then give practical steps.
     if stress_level in ["Moderate", "Severe"]:
         show hana neutral at hana_pos
-        e "Let's look at what's been adding to the stress so I can suggest a few practical steps."
+        e "The next section identifies stress factors and possible actions."
         show hana neutral at hana_pos
         call affective_input from _stress_affective_input
         jump session_end_loop
@@ -1036,8 +1036,8 @@ label session_end_loop:
         # Normal / Mild stress
         if stress_level in ["Normal", "Mild"]:
             show hana neutral at hana_pos
-            e "Before we finish, you could try a short breathing exercise."
-            e "Would you like to give it a try?"
+            e "A short breathing exercise is available before ending."
+            e "Select whether to proceed."
 
             menu:
                 "Yes, let's try it":
@@ -1068,8 +1068,8 @@ label session_end_loop:
         # Moderate or severe yg tak lepas calming loop
         else:
             show hana neutral at hana_pos
-            e "Before we finish, you could try a short calming exercise."
-            e "Would you like to give it a try?"
+            e "A short calming exercise is available before ending."
+            e "Select whether to proceed."
 
             menu:
                 "Yes, let's try it":
@@ -1120,7 +1120,7 @@ label affective_input:
             $ ans = "Mentally drained most of the time"
             $ aff_score = 3
             show hana neutral at hana_pos
-            e "For mental fatigue, scheduling short rest breaks between tasks helps maintain your energy through the day."
+            e "A short breathing exercise is available before ending."
 
         "I keep worrying even when I try to do other things.":
             $ day_impact = "worry"
@@ -1224,10 +1224,10 @@ label affective_input:
 
     if stress_level == "Severe":
         e "When stress builds up like this, it helps to take one priority at a time rather than everything at once."
-        e "Writing your tasks down and ranking them by urgency can make a heavy workload feel more manageable."
+        e "Writing tasks down and ranking them by urgency can support workload organisation."
     else:
         e "A good starting point is to pick out your most urgent tasks and focus on those first."
-        e "Setting the non-essential ones aside for later can take some of the pressure off."
+        e "Non-essential tasks can be deferred to reduce immediate task load."
 
     show hana neutral at hana_pos
     return
@@ -1262,7 +1262,7 @@ label post_response(strategy="general", feedback_prompt="Did checking in today f
     )
 
     show hana neutral at hana_pos
-    e "Thank you for letting me know."
+    e "Response recorded."
 
     $ feedback_given = True  # user has now given feedback; session is allowed to end
 
@@ -1303,14 +1303,14 @@ label calming_loop:
 
         # Brief bridge before second technique
         show hana neutral at hana_pos
-        e "Let's try one more. This one is a little different."
+        e "Another support options will use."
 
         # Deliver second technique
         call deliver_technique(tech2) from _deliver_tech_b
 
         # Ask calm state after both techniques
         show hana neutral at hana_pos
-        e "How are you feeling now, [user_name]?"
+        e "Select your current stress state."
         menu:
             "Still very stressed":
                 $ calm_rating = 1
@@ -1362,7 +1362,7 @@ label calming_loop:
         if calm_rating >= 4:
             show hana neutral at hana_pos
             e "That's the end of this exercise."
-            e "You can use these techniques again any time you want to wind down."
+            e "These techniques can be repeated after the session ends."
             if not feedback_given:
                 call post_response(last_empathy_mode) from _calm_post_response_a
             return
@@ -1372,9 +1372,8 @@ label calming_loop:
 
     # if user reaches max calm loop but is still stressed
     show hana neutral at hana_pos
-    e "That's the last exercise for now."
-    e "If stress continues to feel heavy, consider reaching out through Befrienders or to someone you trust."
-    e "You do not have to handle this alone."
+    e "That's the last exercise."
+    e "If high stress persists, consider Befrienders or professional healthcare support."
     $ log_interaction(
         session_filename, session_id,
         "Calming loop ended (max loops)", "rating=" + str(calm_rating),
@@ -1550,12 +1549,12 @@ label phase5_close_update(end_action):
     $ renpy.save("auto-1")
 
     show hana neutral at hana_pos
-    e "That's all for today, [user_name]."
+    e "Session complete."
 
     if final_calm_text == "still_stressed":
-        e "If the stress keeps up, it's worth reaching out through BeHealth or to a healthcare professional for further support."
+        e "If high stress persists, consider contacting Befrienders or a healthcare professional."
 
-    e "You can come back any time to check in again."
+    e "A new session can be started later."
     stop music fadeout 5.0
 
     return
