@@ -3,14 +3,14 @@
     "google_play_key": null,
     "google_play_salt": null,
     "heap_size": "3",
-    "icon_name": "HANA Adaptive",
+    "icon_name": "HANA Neutral",
     "include_pil": false,
     "include_sqlite": false,
     "layout": null,
-    "name": "HANA Adaptive",
+    "name": "HANA Neutral",
     "numeric_version": 1,
     "orientation": "sensorLandscape",
-    "package": "hana.uum.adaptive",
+    "package": "hana.uum.neutral",
     "permissions": [
         "VIBRATE",
         "INTERNET"
