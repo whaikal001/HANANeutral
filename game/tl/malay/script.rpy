@@ -889,3 +889,129 @@ translate malay strings:
     # game/script.rpy:1334
     old "I'd like to stop here for now"
     new "Saya ingin berhenti di sini buat masa ini"
+# TODO: Translation updated at 2026-06-30 14:28
+
+# game/script.rpy:689
+translate malay start_73d62284:
+
+    # centered "Disclaimer:\n\nThis session includes some questions about stress from the Depression Anxiety Stress Scales (DASS). \ These questions are used for research only. They are not a medical test and cannot diagnose or treat mental health conditions.\n\n{size=-10}This research was supported by the Ministry of Higher Education (MoHE) of Malaysia through the Fundamental Research Grant Scheme (FRGS/1/2024/ICT02/UUM/02/1){/size}"
+    centered "Penafian:\n\nSesi ini mengandungi beberapa soalan tentang tekanan daripada Depression Anxiety Stress Scales (DASS). Soalan-soalan ini digunakan untuk penyelidikan sahaja. Ia bukan ujian perubatan dan tidak boleh mendiagnosis atau merawat masalah kesihatan mental.\n\n{size=-10}Penyelidikan ini disokong oleh Kementerian Pendidikan Tinggi (KPT) Malaysia melalui Skim Geran Penyelidikan Fundamental (FRGS/1/2024/ICT02/UUM/02/1){/size}"
+
+# game/script.rpy:854
+translate malay start_b44e9519:
+
+    # e "Did anything make you feel stressed or upset today?"
+    e "Adakah ada apa-apa yang membuatkan anda berasa tertekan atau kecewa hari ini?"
+
+# game/script.rpy:1593
+translate malay phase5_close_update_3deac59d:
+
+    # e "If high stress persists, consider contacting Befrienders (03-7627 2929) or a healthcare professional."
+    e "Jika tekanan yang tinggi berterusan, pertimbangkan untuk menghubungi Befrienders (03-7627 2929) atau seorang profesional penjagaan kesihatan."
+
+translate malay strings:
+
+    # game/script.rpy:780
+    old "Hi."
+    new "Hai."
+
+    # game/script.rpy:818
+    old "I feel good"
+    new "Saya rasa baik"
+
+    # game/script.rpy:821
+    old "I feel quite okay"
+    new "Saya rasa agak baik"
+
+    # game/script.rpy:824
+    old "I feel a little stressed"
+    new "Saya rasa sedikit tertekan"
+
+    # game/script.rpy:827
+    old "I feel very stressed"
+    new "Saya rasa sangat tertekan"
+
+    # game/script.rpy:837
+    old "I have been doing many things today"
+    new "Saya melakukan banyak perkara hari ini"
+
+    # game/script.rpy:840
+    old "I have been resting and having time for myself"
+    new "Saya berehat dan meluangkan masa untuk diri sendiri"
+
+    # game/script.rpy:843
+    old "I feel tired from everything"
+    new "Saya rasa letih dengan semua perkara"
+
+    # game/script.rpy:846
+    old "Honestly, it has been a hard day"
+    new "Sejujurnya, hari ini agak sukar"
+
+    # game/script.rpy:876
+    old "I did something important"
+    new "Saya melakukan sesuatu yang penting"
+
+    # game/script.rpy:879
+    old "I had a nice time with someone"
+    new "Saya meluangkan masa yang menyenangkan bersama seseorang"
+
+    # game/script.rpy:882
+    old "I cannot think of anything"
+    new "Saya tidak dapat memikirkan apa-apa"
+
+    # game/script.rpy:885
+    old "It has been hard lately"
+    new "Kebelakangan ini agak sukar"
+
+    # game/script.rpy:1040
+    old "I want to continue a little longer"
+    new "Saya mahu teruskan sebentar lagi"
+
+    # game/script.rpy:1049
+    old "That is enough for me today"
+    new "Itu sudah cukup untuk saya hari ini"
+
+    # game/script.rpy:1085
+    old "I'll stop here for today"
+    new "Saya berhenti di sini untuk hari ini"
+
+    # game/script.rpy:1343
+    old "I'm still very stressed"
+    new "Saya masih sangat tertekan"
+
+    # game/script.rpy:1347
+    old "I'm still a bit stressed"
+    new "Saya masih sedikit tertekan"
+
+    # game/script.rpy:1351
+    old "I'm feeling a little better"
+    new "Saya rasa sedikit lebih baik"
+
+    # game/script.rpy:1355
+    old "I'm feeling calmer"
+    new "Saya rasa lebih tenang"
+
+    # game/script.rpy:1359
+    old "I'm feeling much calmer"
+    new "Saya rasa jauh lebih tenang"
+
+    # game/script.rpy:1363
+    old "I'd like to stop for now"
+    new "Saya ingin berhenti buat masa ini"
+
+    # game/script.rpy:1436
+    old "Hold your breath for seven seconds."
+    new "Tahan nafas anda selama tujuh saat."
+
+    # game/script.rpy:1442
+    old "Breath in"
+    new "Tarik nafas"
+
+    # game/script.rpy:1444
+    old "Hold breath."
+    new "Tahan nafas."
+
+    # game/script.rpy:1446
+    old "Breath out."
+    new "Hembus nafas."
+

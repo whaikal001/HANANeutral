@@ -1,4 +1,15 @@
 ﻿image bg room = "room.png"
+
+# Funder/institution logos shown on the disclaimer screen.
+# Put the three logo files in game/images/ named exactly: logo_uum.png, logo_kpt.png, logo_ums.png
+# (PNG with transparent background works best). ysize sets a common height; spacing is the gap between them.
+image logos_row = HBox(
+    Transform("logo_uum.png", fit="contain", ysize=160),
+    Transform("logo_kpt.png", fit="contain", ysize=160),
+    Transform("logo_ums.png", fit="contain", ysize=160),
+    spacing=80,
+)
+
 #kucing tukar position
 image room_cat_wake = Transform("room_catWakeup.png", xysize=(1920, 1080), fit="cover")
 image room_cat_walk = Transform("room_catwalkaway.png", xysize=(1920, 1080), fit="cover")
@@ -51,6 +62,9 @@ image hana listening eyeclose = "Sprites/Listening_eyeclose.png"
 # scene extra untuk imagine
 image beach = "beautifulbeach.jpg"
 image beachscene = Movie(play="video/beachscene.webm")
+# 4-7-8 breathing guide (animated). Uses a looping webm so it actually plays;
+# Ren'Py does not animate .gif files (it would only show the first frame).
+image breathing_guide = Movie(play="video/478breathing.webm", loop=True)
 
 # --- Hana Location transforms ---
 transform hana_center:
@@ -163,6 +177,17 @@ transform scene_right:
     on hide:
         alpha 1.0
         linear 0.4 alpha 0.0 xoffset 80
+
+# position for the 4-7-8 breathing guide (shown on the right while Hana stays left)
+transform breathing_guide_pos:
+    zoom 0.5
+    xalign 0.9
+    yalign 0.42
+    on show:
+        alpha 0.0
+        linear 0.4 alpha 1.0
+    on hide:
+        linear 0.4 alpha 0.0
 
 init python:
     import math
@@ -658,8 +683,12 @@ label start:
 
     scene black
     with fade
-    centered "Disclaimer:\n\nThis session uses some questions from the Depression Anxiety Stress Scales (DASS), specifically the stress subscale. \
-    These items are included for research and educational purposes only, and are not a substitute for professional diagnosis or treatment."
+
+    show logos_row:
+        xalign 0.5 yalign 0.9
+    centered "Disclaimer:\n\nThis session includes some questions about stress from the Depression Anxiety Stress Scales (DASS). \
+    These questions are used for research only. They are not a medical test and cannot diagnose or treat mental health conditions.\n\n{size=-10}This research was supported by the Ministry of Higher Education (MoHE) of Malaysia through the Fundamental Research Grant Scheme (FRGS/1/2024/ICT02/UUM/02/1){/size}"
+    hide logos_row
 
     scene bg room_cat
     show black:
@@ -749,7 +778,7 @@ label start:
                 show hana neutral at hana_pos
 
                 e "Input received. Beginning session."
-            "...Hi.":
+            "Hi.":
                 show hana neutral at hana_pos
  
                 e "Input received. Beginning session."
@@ -762,13 +791,13 @@ label start:
         e "You can choose either."
 
         menu:
-            "Yes, music would be nice":
+            "Yes, I would like music.":
                 $ music_pref = True
                 show hana neutral at hana_pos
                 e "Music will play in the background."
                 play music "audio/BGM/Hana_lofi.mp3" volume 0.2 fadein 3.0 loop
 
-            "No, I'd prefer quiet":
+            "No, I would like silence.":
                 $ music_pref = False
                 show hana neutral at hana_pos
                 e "No music will play."
@@ -787,35 +816,35 @@ label start:
 
     e "Please select your current state today"
     menu:
-        "I'm feeling good":
-            $ ans = "I'm feeling good"
+        "I feel good":
+            $ ans = "I feel good"
             $ s_in = 0.0
-        "Pretty okay overall":
-            $ ans = "Pretty okay overall"
+        "I feel quite okay":
+            $ ans = "I feel quite okay"
             $ s_in = 0.33
-        "A bit stressed":
+        "I feel a little stressed":
             $ ans = "A bit stressed"
             $ s_in = 0.67
-        "Really overwhelmed":
-            $ ans = "Really overwhelmed"
+        "I feel very stressed":
+            $ ans = "Really stressed"
             $ s_in = 1.0
 
     $ checkin_s_in_history.append(s_in)
-    call empathy_step("How have you been feeling today?", ans, s_in, "checkin_q1", speak=False) from _checkin_q1
+    call empathy_step("How do you feel today?", ans, s_in, "checkin_q1", speak=False) from _checkin_q1
 
     show hana neutral at hana_pos
     e "How has your day been so far?"
     menu:
-        "Being productive and getting things done":
+        "I have been doing many things today":
             $ ans = "Being productive and getting things done"
             $ s_in = 0.0
-        "Relaxing and enjoying some me-time":
+        "I have been resting and having time for myself":
             $ ans = "Relaxing and enjoying some me-time"
             $ s_in = 0.0
-        "Feeling exhausted from everything":
+        "I feel tired from everything":
             $ ans = "Feeling exhausted from everything"
             $ s_in = 0.67
-        "Honestly, it's been a rough day":
+        "Honestly, it has been a hard day":
             $ ans = "Honestly, it's been a rough day"
             $ s_in = 1.0
 
@@ -823,7 +852,7 @@ label start:
     call empathy_step("How has your day been so far?", ans, s_in, "checkin_q2", speak=False) from _checkin_q2
 
     show hana neutral at hana_pos
-    e "Did anything feel stressful or frustrating for you today?"
+    e "Did anything make you feel stressed or upset today?"
     menu:
         "Not really":
             $ ans = "Not really"
@@ -839,27 +868,27 @@ label start:
             $ s_in = 1.0
 
     $ checkin_s_in_history.append(s_in)
-    call empathy_step("Did anything feel stressful or frustrating for you today?", ans, s_in, "checkin_q3", speak=False) from _checkin_q3
+    call empathy_step("Did anything make you feel stressed or upset today?", ans, s_in, "checkin_q3", speak=False) from _checkin_q3
 
     show hana neutral at hana_pos
     e "One more question."
-    e "Identify any recent positive event, if applicable."
+    e "Identify any recent good event"
     menu:
-        "I accomplished something important":
+        "I did something important":
             $ ans = "I accomplished something important"
             $ s_in = 0.0
-        "I had a nice moment with someone":
+        "I had a nice time with someone":
             $ ans = "I had a nice moment with someone"
             $ s_in = 0.0
-        "I can't really think of anything":
+        "I cannot think of anything":
             $ ans = "I can't really think of anything"
             $ s_in = 0.5
-        "Honestly, it's been hard lately":
+        "It has been hard lately":
             $ ans = "Honestly, it's been hard lately"
             $ s_in = 1.0
 
     $ checkin_s_in_history.append(s_in)
-    call empathy_step("What's something that has gone well for you recently?", ans, s_in, "checkin_q4", speak=False) from _checkin_q4
+    call empathy_step("What is one good thing that happened to you recently?", ans, s_in, "checkin_q4", speak=False) from _checkin_q4
 
     show hana neutral at hana_pos
     jump stress_input
@@ -884,13 +913,13 @@ label empathy_step(question, ans, s_in, phase, speak=True):
 label stress_input:
     $ hana_pos = pick_random_scene_pos()
     $ stress_questions = [
-        "After a long day, do you find it tricky to calm down?",
-        "Do small things sometimes feel bigger than they are?",
-        "Do you ever feel like you're running on nervous energy?",
-        "Do you catch yourself getting restless more easily?",
-        "Is it hard to fully let go and feel settled?",
-        "If something interrupts you, does frustration creep in quickly?",
-        "Do you sometimes feel extra sensitive or touchy?"
+        "After a long day, is it hard for you to relax?",
+        "Do small problems sometimes feel bigger than they really are?",
+        "Do you ever feel nervous for no clear reason?",
+        "Do you get restless more easily than usual?",
+        "Is it hard for you to feel calm and relaxed?",
+        "If something interrupts you, do you get frustrated quickly?",
+        "Do you sometimes feel more sensitive than usual?",
     ]
 
     $ stress_responses = []
@@ -1009,7 +1038,7 @@ label session_end_loop:
             e "You can do another coping exercise, or end the session here."
 
             menu:
-                "I'd like to keep going a little longer":
+                "I want to continue a little longer":
                     $ log_interaction(
                         session_filename, session_id,
                         "Session menu", "continue_coping",
@@ -1018,7 +1047,7 @@ label session_end_loop:
                     )
                     call calming_loop from _continue_calming_loop
 
-                "I think that's enough for me today":
+                "That is enough for me today":
                     if not feedback_given:
                         call post_response(last_empathy_mode) from _end_post_response
                     $ log_interaction(
@@ -1054,7 +1083,7 @@ label session_end_loop:
                     call phase5_close_update("guided") from _phase5_after_guided
                     $ session_done = True
 
-                "No, I'm okay for today":
+                "I'll stop here for today":
                     $ log_interaction(
                         session_filename, session_id,
                         "Session menu", "exit",
@@ -1086,7 +1115,7 @@ label session_end_loop:
                     call phase5_close_update("guided") from _phase5_after_guided_ms
                     $ session_done = True
 
-                "No, I'm okay for today":
+                "I'll stop here for today":
                     $ log_interaction(
                         session_filename, session_id,
                         "Session menu", "exit",
@@ -1241,15 +1270,15 @@ label post_response(strategy="general", feedback_prompt="Did checking in today f
     e "[feedback_prompt!t]"
 
     menu:
-        "Yes, it helped":
+        "Yes":
             $ feedback = 1.0
             $ help_ans = "Yes"
         "A little":
             $ feedback = 0.5
             $ help_ans = "A little"
-        "Not really":
+        "No":
             $ feedback = 0.0
-            $ help_ans = "Not really"
+            $ help_ans = "No"
 
     # NEUTRAL: record the rating only. No feedback learning, no weighting.
     $ post_rating = {1.0: 5, 0.5: 3, 0.0: 1}[feedback]
@@ -1312,27 +1341,27 @@ label calming_loop:
         show hana neutral at hana_pos
         e "Select your current stress state."
         menu:
-            "Still very stressed":
+            "I'm still very stressed":
                 $ calm_rating = 1
                 $ s_in = 1.0
                 $ ans = "Still very stressed"
-            "A bit stressed":
+            "I'm still a bit stressed":
                 $ calm_rating = 2
                 $ s_in = 0.67
                 $ ans = "A bit stressed"
-            "Somewhere in between":
+            "I'm feeling a little better":
                 $ calm_rating = 3
                 $ s_in = 0.33
                 $ ans = "Somewhere in between"
-            "A little calmer":
+            "I'm feeling calmer":
                 $ calm_rating = 4
                 $ s_in = 0.1
                 $ ans = "A little calmer"
-            "Much calmer / peaceful":
+            "I'm feeling much calmer":
                 $ calm_rating = 5
                 $ s_in = 0.0
                 $ ans = "Much calmer"
-            "I'd like to stop here for now":
+            "I'd like to stop for now":
                 $ should_exit = True
                 $ ans = "I'd like to stop"
 
@@ -1397,20 +1426,30 @@ label deliver_technique(tech):
         e "This is a breathing exercise."
         e "Under stress, breathing tends to become quicker and shallower."
         e "Slowing the breath can lower the physical signs of stress."
+        # step Hana to the left for the breathing rounds
+        $ hana_pos = hana_left
         show hana neutral at hana_pos
         e "Follow this pattern."
-        show hana neutral at hana_pos
-        e "Breathe in through your nose for four counts."
-        e "In.. one, two, three, four." 
-        e "Hold."
-        e "Hold.. two, three,four, five, six, seven."
-        e "Breathe out through your mouth for eight counts."
-        e "two, three, four, five, six, seven, eight."
-        show hana neutral at hana_pos
-        e "Repeat once more."
-        e "In.. one, two, three, four."  
-        e "Hold.. two, three, four, five, six, seven."
-        e "And out.. two, three, four, five, six, seven, eight."
+        show breathing_guide at breathing_guide_pos
+        python:
+            e(_("Breathe in through your nose for four seconds."), interact=False)
+            renpy.pause(3.0)
+            e(_("Hold your breath for seven seconds."), interact=False)
+            renpy.pause(7.0)
+            e(_("Breathe out through your mouth for eight seconds."), interact=False)
+            renpy.pause(8.0)
+            # two full 4-7-8 breathing rounds
+            for _round in range(2):
+                e(_("Breath in"), interact=False)
+                renpy.pause(4.0)
+                e(_("Hold breath."), interact=False)
+                renpy.pause(7.0)
+                e(_("Breath out."), interact=False)
+                renpy.pause(8.0)
+                if _round == 0:
+                    e(_("Repeat once more."), interact=False)
+                    renpy.pause(2.0)
+        hide breathing_guide
         show hana neutral at hana_pos
         e "A few slow breaths can reduce the body's stress response."
 
@@ -1552,7 +1591,7 @@ label phase5_close_update(end_action):
     e "Session complete."
 
     if final_calm_text == "still_stressed":
-        e "If high stress persists, consider contacting Befrienders or a healthcare professional."
+        e "If high stress persists, consider contacting Befrienders (03-7627 2929) or a healthcare professional."
 
     e "A new session can be started later."
     stop music fadeout 5.0

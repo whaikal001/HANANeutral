@@ -66,26 +66,26 @@ translate malay strings:
     old "Thank you for staying with me through these questions."
     new "Terima kasih kerana terus bersama saya sepanjang soalan-soalan ini."
 
-    old "After a long day, do you find it tricky to calm down?"
-    new "Selepas hari yang panjang, adakah anda sukar untuk menenangkan diri?"
+    old "After a long day, is it hard for you to relax?"
+    new "Selepas hari yang panjang, adakah sukar untuk anda berehat?"
 
-    old "Do small things sometimes feel bigger than they are?"
-    new "Adakah perkara kecil kadangkala terasa lebih besar daripada sebenarnya?"
+    old "Do small problems sometimes feel bigger than they really are?"
+    new "Adakah masalah kecil kadangkala terasa lebih besar daripada yang sebenarnya?"
 
-    old "Do you ever feel like you're running on nervous energy?"
-    new "Pernahkah anda berasa seperti anda bergerak dengan tenaga yang gugup?"
+    old "Do you ever feel nervous for no clear reason?"
+    new "Pernahkah anda berasa gementar tanpa sebab yang jelas?"
 
-    old "Do you catch yourself getting restless more easily?"
-    new "Adakah anda mendapati diri anda lebih mudah menjadi gelisah?"
+    old "Do you get restless more easily than usual?"
+    new "Adakah anda lebih mudah berasa gelisah daripada biasa?"
 
-    old "Is it hard to fully let go and feel settled?"
-    new "Adakah sukar untuk benar-benar berehat dan berasa tenang?"
+    old "Is it hard for you to feel calm and relaxed?"
+    new "Adakah sukar untuk anda berasa tenang dan santai?"
 
-    old "If something interrupts you, does frustration creep in quickly?"
-    new "Jika sesuatu mengganggu anda, adakah rasa kecewa cepat menyelinap masuk?"
+    old "If something interrupts you, do you get frustrated quickly?"
+    new "Jika sesuatu mengganggu anda, adakah anda cepat berasa kecewa?"
 
-    old "Do you sometimes feel extra sensitive or touchy?"
-    new "Adakah anda kadangkala berasa lebih sensitif atau mudah tersinggung?"
+    old "Do you sometimes feel more sensitive than usual?"
+    new "Adakah anda kadangkala berasa lebih sensitif daripada biasa?"
 
     old "That sounds manageable."
     new "Itu nampaknya masih terkawal."
@@ -504,4 +504,23 @@ translate malay strings:
 
     old "Thank you. We'll keep going at a pace that feels right for you."
     new "Terima kasih. Kita akan teruskan mengikut kadar yang selesa untuk anda."
+
+    # 4-7-8 breathing spoken guidance (shown via _() during the auto-paced rounds)
+    old "Breathe in through your nose for four seconds."
+    new "Tarik nafas melalui hidung selama empat saat."
+
+    old "Breathe out through your mouth for eight seconds."
+    new "Hembus nafas melalui mulut selama lapan saat."
+
+    old "In.. one, two, three, four."
+    new "Tarik... satu, dua, tiga, empat."
+
+    old "Hold.. two, three, four, five, six, seven."
+    new "Tahan... dua, tiga, empat, lima, enam, tujuh."
+
+    old "And out.. two, three, four, five, six, seven, eight."
+    new "Dan hembus... dua, tiga, empat, lima, enam, tujuh, lapan."
+
+    old "Repeat once more."
+    new "Ulang sekali lagi."
 

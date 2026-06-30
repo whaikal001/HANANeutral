@@ -14,3 +14,11 @@ translate malay strings:
     old "Hana Adaptive"
     new "Hana Adaptive"
 
+# TODO: Translation updated at 2026-06-30 14:28
+
+translate malay strings:
+
+    # game/options.rpy:15
+    old "HANA Neutral"
+    new "HANA Neutral"
+
