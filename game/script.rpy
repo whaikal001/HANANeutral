@@ -1,9 +1,4 @@
-﻿image bg room = "room.png"
-
-# Funder/institution logos shown on the disclaimer screen.
-# Put the three logo files in game/images/ named exactly: logo_uum.png, logo_kpt.png, logo_ums.png
-# (PNG with transparent background works best). ysize sets a common height; spacing is the gap between them.
-image logos_row = HBox(
+﻿image logos_row = HBox(
     Transform("logo_uum.png", fit="contain", ysize=160),
     Transform("logo_kpt.png", fit="contain", ysize=160),
     Transform("logo_ums.png", fit="contain", ysize=160),
@@ -21,104 +16,10 @@ image bg room_cat:
     pause 1.6
     "room_cat_shelf"
 image hana neutral = "Sprites/Neutral.png"
-image hana smiling = "Sprites/Smiling.png"
-image hana thinking:
-    "Sprites/Thinking.png"
-    pause renpy.random.uniform(0.6, 1.4)
-    block:
-        "Sprites/thinking_eyeclose.png"
-        zoom 2.51
-        pause 0.18
-        "Sprites/Thinking.png"
-        zoom 1.0
-        pause renpy.random.uniform(2.4, 5.0)
-        repeat
-image hana sad = "Sprites/Sad.png"
-image hana empathetic high = "Sprites/Empathetic high.png"
-image hana empathetic low = "Sprites/Empathetic low.png"
-image hana warm high = "Sprites/Warm high.png"
-image hana warm low = "Sprites/Warm low.png"
-image hana concerned high = "Sprites/Concerned high.png"
-image hana concerned low = "Sprites/Concerned low.png"
-image hana encouraging = "Sprites/Encouraging.png"
-image hana good job = "Sprites/Good job.png"
-image hana waving = "Sprites/Waving.png"
-image hana hello = "Sprites/Waving.png"
-image hana listening:
-    "Sprites/Listening.png"
-    pause renpy.random.uniform(0.6, 1.4)
-    block:
-        "Sprites/Listening_eyeclose.png"
-        pause 0.18
-        "Sprites/Listening.png"
-        pause renpy.random.uniform(2.4, 5.0)
-        repeat
-image hana surprised = "Sprites/Thinking.png"
 
-# method hana wink
-image hana thinking eyeclose = "Sprites/thinking_eyeclose.png"
-image hana listening eyeclose = "Sprites/Listening_eyeclose.png"
-
-# scene extra untuk imagine
-image beach = "beautifulbeach.jpg"
-image beachscene = Movie(play="video/beachscene.webm")
 # 4-7-8 breathing guide (animated). Uses a looping webm so it actually plays;
 # Ren'Py does not animate .gif files (it would only show the first frame).
 image breathing_guide = Movie(play="video/478breathing.webm", loop=True)
-
-# --- Hana Location transforms ---
-transform hana_center:
-    zoom 0.7
-    xalign 1.0
-    yanchor 0.925
-    ypos 0.993
-
-    on show:
-        alpha 0.0
-        linear 0.3 alpha 1.0
-    on replace:
-        linear 0.15 alpha 1.0
-    on hide:
-        alpha 1.0
-        linear 0.3 alpha 0.0
-
-transform hana_transition:
-    zoom 0.7
-    xalign 0.5
-    yanchor 0.925
-    ypos 0.993
-    
-    on show:
-        alpha 0.0
-        linear 0.3 alpha 1.0
-    on replace:
-        linear 0.15 alpha 1.0
-    on hide:
-        alpha 1.0
-        linear 0.3 alpha 0.0
-
-transform hana_quick_change:
-    zoom 0.7
-    xalign 0.5
-    yanchor 0.925
-    ypos 0.993
-    linear 0.15 alpha 0.5
-    linear 0.15 alpha 1.0
-
-transform hana_center_listen:
-    zoom 1.82
-    xalign renpy.random.choice([0.10, 0.22, 0.34])
-    yanchor 0.912
-    ypos 0.993
-
-    on show:
-        alpha 0.0
-        linear 0.3 alpha 1.0
-    on replace:
-        linear 0.15 alpha 1.0
-    on hide:
-        alpha 1.0
-        linear 0.3 alpha 0.0
 
 # --- Random scene position transforms ---
 transform hana_left:
@@ -163,22 +64,6 @@ transform hana_right:
         alpha 1.0
         linear 0.3 alpha 0.0
 
-# guna bila method imaginary
-transform scene_right:
-    zoom 0.5
-    xalign 0.95
-    yalign 0.5
-    on show:
-        alpha 0.0
-        xoffset 80
-        linear 0.6 alpha 1.0 xoffset 0
-    on replace:
-        linear 0.2 alpha 1.0 xoffset 0
-    on hide:
-        alpha 1.0
-        linear 0.4 alpha 0.0 xoffset 80
-
-# position for the 4-7-8 breathing guide (shown on the right while Hana stays left)
 transform breathing_guide_pos:
     zoom 0.5
     xalign 0.9
@@ -190,8 +75,6 @@ transform breathing_guide_pos:
         linear 0.4 alpha 0.0
 
 init python:
-    import math
-    import random
     import datetime, csv, uuid, os
 
     def _hana_writable_log_dir():
@@ -222,20 +105,46 @@ init python:
     def generate_session_id():
         return str(uuid.uuid4())[:8]
 
+    # Study log layout, the same for all three arms:
+    # HANA_[ParticipantID]_[Condition]_[DateTime].csv with these columns.
+    HANA_CONDITION_CODE = "NEU"
+    SESSION_LOG_HEADER = [
+        "Participant_ID", "Session_ID", "Condition", "Timestamp", "Cycle",
+        "Stage", "Duration", "HANA_Question", "User_Response", "HANA_Response",
+        "Ea", "Ec", "Be", "D", "Ep", "E", "I", "Ed", "H", "Ed_Adaptive",
+        "Behaviour_Profile",
+    ]
+
+    def hana_participant_id():
+        try:
+            return "P%02d" % int(renpy.store.hana_selected_profile_slot)
+        except Exception:
+            return "P00"
+
     def make_session_filename():
-        return f"session_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+        return "HANA_%s_%s_%s.csv" % (
+            hana_participant_id(), HANA_CONDITION_CODE,
+            datetime.datetime.now().strftime("%Y%m%d_%H%M%S"),
+        )
 
     def log_interaction(session_filename, session_id, question, answer,
                         score=None, stress_level=None,
                         Ea=None, Ec=None, Ad=None, Be=None, D=None, Ep=None,
-                        empathy_mode=None):
+                        empathy_mode=None, extra=None):
+        # The step tag passed as empathy_mode goes in Stage. The neutral arm
+        # computes no E, I, Bl, Cycle, Ed, H or Ed_Adaptive, so those stay blank.
+        x = {"participant_id": hana_participant_id(), "stage": empathy_mode, "Bl": None}
+        x.update(extra or {})
 
         log_path = os.path.join(DROPBOX_LOG_DIR, session_filename)
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         row = [
-            timestamp, session_id, question, answer, score, stress_level,
-            Ea, Ec, Ad, Be, D, Ep, empathy_mode
+            x["participant_id"], session_id, HANA_CONDITION_CODE, timestamp,
+            x.get("cycle"), x["stage"], x.get("duration"),
+            question, answer, x.get("hana_response"), Ea, Ec, Be, D, Ep,
+            x.get("E"), x.get("I"), x.get("Ed"), x.get("H"), x.get("Ed_adaptive"),
+            x["Bl"],
         ]
 
         try:
@@ -243,67 +152,26 @@ init python:
             with open(log_path, "a", newline="", encoding="utf-8") as f:
                 writer = csv.writer(f)
                 if write_header:
-                    writer.writerow([
-                        "timestamp","session_id","question","answer","score",
-                        "stress_level","Ea","Ec","Ad","Be","D","Ep","empathy_mode"
-                    ])
+                    writer.writerow(SESSION_LOG_HEADER)
                 writer.writerow(row)
         except Exception:
-            pass  
+            pass
         try:
             hana_sync_interaction(
                 session_id, session_filename, timestamp, question, answer,
                 score, stress_level, Ea, Ec, Ad, Be, D, Ep, empathy_mode,
+                extra=x,
             )
         except Exception:
             pass
-
-    def log_interaction_enhanced(session_filename, session_id, question, answer,
-                        score=None, stress_level=None,
-                        Ea=None, Ec=None, Ad=None, Be=None, D=None, Ep=None,
-                        empathy_mode=None, Ea_history=None, user_struggles=None, 
-                        struggle_intensity=None, mode_shift_count=None, current_mode=None):
-        
-        log_path = os.path.join(DROPBOX_LOG_DIR, session_filename)
-        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        
-        # Format Ea_history for logging
-        ea_hist_str = "|".join([f"{x:.3f}" for x in (Ea_history or [])]) if Ea_history else ""
-        
-        row = [
-            timestamp, session_id, question, answer, score, stress_level,
-            Ea, Ec, Ad, Be, D, Ep, empathy_mode,
-            ea_hist_str, user_struggles, struggle_intensity, mode_shift_count, current_mode
-        ]
-        
-        try:
-            write_header = not os.path.exists(log_path)
-            with open(log_path, "a", newline="", encoding="utf-8") as f:
-                writer = csv.writer(f)
-                if write_header:
-                    writer.writerow([
-                        "timestamp","session_id","question","answer","score",
-                        "stress_level","Ea","Ec","Ad","Be","D","Ep","empathy_mode",
-                        "Ea_history","user_struggles","struggle_intensity","mode_shift_count","current_mode"
-                    ])
-                writer.writerow(row)
-        except Exception:
-            pass  
-
-        try:
-            hana_sync_interaction(
-                session_id, session_filename, timestamp, question, answer,
-                score, stress_level, Ea, Ec, Ad, Be, D, Ep, empathy_mode,
-                extra={
-                    "Ea_history": ea_hist_str,
-                    "user_struggles": user_struggles,
-                    "struggle_intensity": struggle_intensity,
-                    "mode_shift_count": mode_shift_count,
-                    "current_mode": current_mode,
-                },
-            )
-        except Exception:
-            pass
+    SESSION_SUMMARY_FIELDS = [
+        "Session start", "Session end", "User", "Profile ID", "Session ID", "Session #",
+        "Condition", "DASS stress raw (0-21)", "DASS stress score (0-42)", "Stress level",
+        "Pathway", "Start stress score", "End stress score", "Stress improvement",
+        "Final calm rating", "Empathy modes", "Last empathy mode", "Intention (I)",
+        "Empathy E", "Activities", "Counselling offered", "Turns", "Duration (min)",
+        "Ended by",
+    ]
 
     def log_session_summary(session_filename, session_id, user_name,
                            start_stress_score, end_stress_score,
@@ -311,44 +179,44 @@ init python:
                            final_calm_rating, session_duration_minutes, end_action,
                            stress_improvement=None,
                            stress_level="", empathy_mode="", intention_level="",
-                           empathy_E="", support_need_announced=""):
+                           empathy_E="", support_need_announced="", extra=None):
 
-
-        log_path = os.path.join(DROPBOX_LOG_DIR, "session_summaries.csv")
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        x = extra or {}
 
-        # calculatee stress
         if stress_improvement is None:
             stress_improvement = start_stress_score - end_stress_score if start_stress_score else 0
 
-        modes_str = "|".join(modes_used) if modes_used else "none"
-        techniques_str = "|".join(techniques_used) if techniques_used else "none"
-
-        row = [
-            timestamp, session_id, user_name, start_stress_score, end_stress_score,
-            stress_improvement, final_calm_rating, modes_str, techniques_str,
-            total_interactions, session_duration_minutes, end_action,
-            stress_level, empathy_mode, intention_level, empathy_E, support_need_announced
+        values = [
+            x.get("session_start", ""), timestamp, user_name, hana_participant_id(),
+            session_id, x.get("session_index", ""), HANA_CONDITION_CODE,
+            x.get("dass_raw", ""), x.get("dass_score", ""), stress_level,
+            x.get("pathway", ""), start_stress_score, end_stress_score,
+            stress_improvement, final_calm_rating,
+            "|".join(modes_used) if modes_used else "none", empathy_mode,
+            intention_level, empathy_E,
+            "|".join(techniques_used) if techniques_used else "none",
+            support_need_announced, total_interactions,
+            session_duration_minutes, end_action,
+        ]
+        rows = [
+            [
+                hana_participant_id(), session_id, HANA_CONDITION_CODE, timestamp,
+                "", "Summary", "", field, value, "",
+            ] + [""] * (len(SESSION_LOG_HEADER) - 10)
+            for field, value in zip(SESSION_SUMMARY_FIELDS, values)
         ]
 
-        header = [
-            "timestamp", "session_id", "user_name", "start_stress_score", "end_stress_score",
-            "stress_improvement", "final_calm_rating", "modes_used", "techniques_used",
-            "total_interactions", "session_duration_minutes", "end_action",
-            "stress_level", "empathy_mode", "intention_level", "empathy_E", "support_need_announced"
-        ]
-        pending_path = os.path.join(DROPBOX_LOG_DIR, "session_summaries_pending.csv")
-        for target in (log_path, pending_path):
-            try:
-                write_header = not os.path.exists(target)
-                with open(target, "a", newline="", encoding="utf-8") as f:
-                    writer = csv.writer(f)
-                    if write_header:
-                        writer.writerow(header)
-                    writer.writerow(row)
-                break
-            except Exception:
-                continue
+        log_path = os.path.join(DROPBOX_LOG_DIR, session_filename)
+        try:
+            write_header = not os.path.exists(log_path)
+            with open(log_path, "a", newline="", encoding="utf-8") as f:
+                writer = csv.writer(f)
+                if write_header:
+                    writer.writerow(SESSION_LOG_HEADER)
+                writer.writerows(rows)
+        except Exception:
+            pass
         try:
             hana_sync_summary(
                 session_id, session_filename, timestamp, user_name,
@@ -357,6 +225,16 @@ init python:
                 total_interactions, session_duration_minutes, end_action,
                 stress_level, empathy_mode, intention_level,
                 empathy_E, support_need_announced,
+                # the backend keeps every session with these, like Adaptive's
+                extra={
+                    "participant_id": hana_participant_id(),
+                    "condition": HANA_CONDITION,
+                    "session_start": x.get("session_start", ""),
+                    "session_index": x.get("session_index", ""),
+                    "dass_raw": x.get("dass_raw", ""),
+                    "dass_score": x.get("dass_score", ""),
+                    "pathway": x.get("pathway", ""),
+                },
             )
         except Exception:
             pass
@@ -375,7 +253,6 @@ init python:
             "last_empathy_mode": "unknown",
             "last_intention_level": "unknown",
             "last_empathy_E": 0.0,
-            "last_calm_rating": None,
             "last_technique": None,
             "last_end_action": "",
             "support_need_announced": False,
@@ -419,7 +296,6 @@ init python:
             "visit_count": 0,
             "last_session_id": "",
             "last_stress_level": "unknown",
-            "last_calm_rating": None,
         }
 
     def load_profile_slot(slot_index):
@@ -446,10 +322,10 @@ init python:
         return slot
 
     def get_or_create_profile_id(slot_index):
+        # P01-style id, the same in all three apps and in the CSV file names.
+        pid = "P%02d" % int(slot_index)
         key, slot_store, slot = load_profile_slot(slot_index)
-        pid = (slot.get("profile_id", "") or "").strip()
-        if not pid:
-            pid = uuid.uuid4().hex
+        if slot.get("profile_id") != pid:
             save_profile_slot(slot_index, {"profile_id": pid})
         return pid
 
@@ -507,70 +383,16 @@ init python:
         dummy1, dummy2, slot = load_profile_slot(slot_index)
         visit_count = slot.get("visit_count", 0)
         last_stress_level = slot.get("last_stress_level", "unknown")
-        last_calm_rating = slot.get("last_calm_rating", None)
 
-        if visit_count <= 0 and last_stress_level == "unknown" and last_calm_rating is None:
+        if visit_count <= 0 and last_stress_level == "unknown":
             return "New slot"
 
-        calm_text = "unknown" if last_calm_rating is None else str(last_calm_rating)
-        return "Visits: %d | Stress: %s | Calm: %s" % (visit_count, last_stress_level, calm_text)
+        return "Visits: %d | Stress: %s" % (visit_count, last_stress_level)
 
     def profile_save_page(slot_index):
         return "profile_%d" % int(slot_index)
-    # --- Update functions ---
-    def clamp01(x):
-        return max(0.0, min(1.0, x))
-
     def clamp_range(x, lo, hi):
         return max(lo, min(hi, x))
-
-    def compassionate_category(Be, theta_be=0.5, theta_be_high=0.8):
-        if Be >= theta_be_high:
-            return "high"
-        if Be >= theta_be:
-            return "low"
-        return None
-    def classify_user_condition(stress_score_value, stress_level_value):
-        if stress_level_value == "Extremely severe" or stress_score_value >= 34:
-            return "Extremely severe distress"
-        if stress_level_value == "Severe" or stress_score_value >= 26:
-            return "Severe distress"
-        if stress_level_value == "Moderate" or stress_score_value >= 19:
-            return "Moderate distress"
-        if stress_level_value == "Mild" or stress_score_value >= 15:
-            return "Mild distress"
-        return "Normal"
-
-    def repeated_prolonged_distress_detected(condition, calm_rating_value, support_announced):
-        if not support_announced:
-            return False
-        if calm_rating_value is None:
-            return condition in ["Severe distress", "Extremely severe distress"]
-        return calm_rating_value <= 2 and condition in ["Moderate distress", "Severe distress", "Extremely severe distress"]
-
-    def feedback_signal_from_rating(calm_rating_value):
-        if calm_rating_value is None:
-            return "neutral"
-        if calm_rating_value <= 2:
-            return "negative"
-        if calm_rating_value >= 4:
-            return "positive"
-        return "neutral"
-
-    def update_empathy_policy_from_feedback(strategy_name, intensity_name, expression_name, feedback_signal):
-        return {}
-
-    def get_animation_transition():
-        return "hana_transition"
-
-    def get_quick_expression_change():
-        return "hana_quick_change"
-
-    def adapt_weights_from_feedback(calm_rating, s_in):
-        return
-    def show_hana_with_fade(expression, at_position="hana_center"):
-        renpy.show(f"hana {expression} at {at_position}")
-        renpy.transition(hana_quick_change)
 
     def pick_random_scene_pos():
         return renpy.random.choice([hana_left, hana_mid, hana_right])
@@ -580,19 +402,14 @@ init 999 python:
     cleanup_unfinished_profile_slots()
 
 default support_need_announced = False
-default compassion_cooldown_steps = 0
-default last_calm_rating = None
-default calm_rated_this_session = False
 default last_technique = None
-default calming_done = False  
-default feedback_given = False  
-default avoid_technique_first = None  
-default struggle_intensity = 0  
-default mode_shift_reason = "" 
+default final_check = ""
 default quick_menu = True
 
 # --- Characters ---
 define e = Character("Hana", color="#b56ab3")
+# Study arm, used by hana_sync.rpy (same file in all three apps).
+define HANA_CONDITION = "neutral"
 
 # =========================
 # STATE VARIABLES
@@ -600,9 +417,6 @@ define e = Character("Hana", color="#b56ab3")
 default stress_level = "Normal"
 default stress_level_desc = "Normal"
 default last_empathy_mode = "neutral"
-default day_impact = ""
-default routine_stress = ""
-default extra_weight = ""
 
 default feedback = 0.0
 
@@ -616,7 +430,7 @@ default session_start_time = None  # Track session duration
 default session_id = ""
 default session_filename = ""
 
-default last_intention_level = "neutral"
+default last_intention_level = "N/A"
 default last_empathy_E = 0.0
 
 default stress_score = 0
@@ -628,66 +442,18 @@ default hana_pos = hana_mid
 # --- Flow Starts ---
 
 
-# fade transition ubah muka
-label hana_wave:
-    show hana neutral at hana_pos
-    with Fade(0.3, 0.0, 0.3)
-    return
-
-label hana_smile:
-    show hana neutral at hana_pos
-    with Fade(0.3, 0.0, 0.3)
-    return
-
-label hana_listen:
-    show hana listening at hana_pos
-    with Fade(0.3, 0.0, 0.3)
-    return
-
-label hana_listen_wink:
-    show hana listening at hana_pos
-    with Fade(0.3, 0.0, 0.3)
-    return
-
-label hana_thinking_wink:
-    show hana neutral at hana_pos
-    with Fade(0.3, 0.0, 0.3)
-    return
-
-label hana_neutral:
-    show hana neutral at hana_pos
-    with Fade(0.3, 0.0, 0.3)
-    return
-
-label hana_concern_low:
-    show hana neutral at hana_pos
-    with Fade(0.3, 0.0, 0.3)
-    return
-
-label hana_concern_high:
-    show hana neutral at hana_pos
-    with Fade(0.3, 0.0, 0.3)
-    return
-
-label hana_encouraging:
-    show hana neutral at hana_pos
-    with Fade(0.3, 0.0, 0.3)
-    return
-
-label hana_good_job:
-    show hana neutral at hana_pos
-    with Fade(0.3, 0.0, 0.3)
-    return
-
 label start:
 
     scene black
     with fade
 
+    # English only, like the Adaptive app (the Malay button was removed).
+    if _preferences.language is not None:
+        $ renpy.change_language(None)
+
     show logos_row:
         xalign 0.5 yalign 0.9
-    centered "Disclaimer:\n\nThis session includes some questions about stress from the Depression Anxiety Stress Scales (DASS). \
-    These questions are used for research only. They are not a medical test and cannot diagnose or treat mental health conditions.\n\n{size=-10}This research was supported by the Ministry of Higher Education (MoHE) of Malaysia through the Fundamental Research Grant Scheme (FRGS/1/2024/ICT02/UUM/02/1){/size}"
+    centered "Disclaimer\n\nThis session includes questions about stress adapted from the DASS-21.\n\nThese questions are for research purposes only. They are not a medical test and cannot be used to diagnose or treat any health condition.\n\n{size=-10}This research is supported by the Ministry of Higher Education (MoHE) Malaysia through the Fundamental Research Grant Scheme (FRGS/1/2024/ICT02/UUM/02/1).{/size}"
     hide logos_row
 
     scene bg room_cat
@@ -703,9 +469,8 @@ label start:
     $ modes_used_list = []
     $ techniques_used_list = []
     $ interaction_count = 0
-    $ calming_done = False
-    $ calm_rated_this_session = False
-    $ feedback_given = False
+    $ last_technique = None
+    $ final_check = ""
     $ session_start_time = datetime.datetime.now()
     $ selected_slot = clamp_range(hana_selected_profile_slot, 1, PROFILE_SLOT_COUNT)
     $ dummy1, dummy2, selected_slot_data = load_profile_slot(selected_slot)
@@ -720,16 +485,9 @@ label start:
         $ user_profile_key, user_profile_store, user_profile = None, None, {}
     $ is_returning_user = user_profile.get("visit_count", 0) > 0
     $ last_stress_level = user_profile.get("last_stress_level", "unknown")
-    $ prev_calm_rating = user_profile.get("last_calm_rating", None)
-    # carry last visit's state forward so repeated_prolonged_distress_detected() can fire
-    $ last_calm_rating = prev_calm_rating
-    $ support_need_announced = user_profile.get("support_need_announced", False)
-    $ prev_technique = user_profile.get("last_technique", None)
-    $ prev_empathy_mode = user_profile.get("last_empathy_mode", "unknown")
-    $ prev_intention_level = user_profile.get("last_intention_level", "unknown")
-
-    # guna dkt technique nnti nak avoid same user dpt technique sama
-    $ avoid_technique_first = prev_technique
+    # True once counselling contacts are offered in this session (see
+    # support_contacts), like the Adaptive app's counselling_offered.
+    $ support_need_announced = False
 
     # idea dr azizi mintak user preference if nk guna music ke tak
     $ music_pref = user_profile.get("music_enabled", None)
@@ -740,13 +498,13 @@ label start:
     if is_returning_user:
     
         show hana neutral at hana_pos
-        e "Session resumed for[user_name]."
+        e "Session resume for [user_name]."
         show hana neutral at hana_pos
         with Fade(0.3, 0.0, 0.3)
         if last_stress_level in ["Moderate", "Severe", "Extremely severe"]:
-            e "Your last recorded stress level was in the higher range."
+            e "Your last stress level is in the high range."
         else:
-            e "Your last recorded stress level was in the lower range."
+            e "Your last stress level is in the low range."
     else:
         
         show hana neutral at hana_pos
@@ -754,7 +512,7 @@ label start:
         if not user_name:
             show hana neutral at hana_pos
             with Fade(0.3, 0.0, 0.3)
-            e "And you are..?"
+            e "And you...?"
             show hana neutral at hana_pos
             $ user_name = renpy.input("")
             $ user_name = user_name.strip().title() if user_name.strip() else "friend"
@@ -763,44 +521,26 @@ label start:
 
         show hana neutral at hana_pos
         with Fade(0.3, 0.0, 0.3)
-        e "User identified as [user_name]."
-        show hana neutral at hana_pos
-        with Fade(0.3, 0.0, 0.3)
-
-        e "My name means \"flower\" in Japanese and \"happiness\" in Arabic."
-       
-        menu:
-            "Nice to meet you too, Hana.":
-                show hana neutral at hana_pos
- 
-                e "Input received. Beginning session."
-            "That's a really pretty name.":
-                show hana neutral at hana_pos
-
-                e "Input received. Beginning session."
-            "Hi.":
-                show hana neutral at hana_pos
- 
-                e "Input received. Beginning session."
-
+        e "User identify as [user_name]."
+    
     # line mintak user nak music ke tak
     if music_pref is None:
         show hana neutral at hana_pos
         with Fade(0.3, 0.0, 0.3)
-        e "Before we continue, would you like background music during this session?"
-        e "You can choose either."
+        e "Would you like some music?"
 
         menu:
-            "Yes, I would like music.":
+            "Yes, please.":
                 $ music_pref = True
                 show hana neutral at hana_pos
-                e "Music will play in the background."
-                play music "audio/BGM/Hana_lofi.mp3" volume 0.2 fadein 3.0 loop
+                e "Okay, I'll play some music."
+                play music "audio/BGM/Hana_lofi.mp3" volume 0.3 fadein 3.0 loop
 
-            "No, I would like silence.":
+            "No, thanks.":
                 $ music_pref = False
+                stop music fadeout 1.0
                 show hana neutral at hana_pos
-                e "No music will play."
+                e "Okay, we'll continue without music."
 
         $ user_profile = save_user_profile(user_name, {"music_enabled": music_pref})
         $ log_interaction(session_filename, session_id,
@@ -814,112 +554,60 @@ label start:
 
     show hana neutral at hana_pos
 
-    e "Please select your current state today"
+    e "How are you feeling today?"
     menu:
-        "I feel good":
+        "I feel good.":
             $ ans = "I feel good"
             $ s_in = 0.0
-        "I feel quite okay":
+        "I'm okay.":
             $ ans = "I feel quite okay"
             $ s_in = 0.33
-        "I feel a little stressed":
+        "I'm not feeling good.":
             $ ans = "A bit stressed"
             $ s_in = 0.67
-        "I feel very stressed":
+        "I feel stressed.":
             $ ans = "Really stressed"
             $ s_in = 1.0
 
     $ checkin_s_in_history.append(s_in)
     call empathy_step("How do you feel today?", ans, s_in, "checkin_q1", speak=False) from _checkin_q1
 
-    show hana neutral at hana_pos
-    e "How has your day been so far?"
-    menu:
-        "I have been doing many things today":
-            $ ans = "Being productive and getting things done"
-            $ s_in = 0.0
-        "I have been resting and having time for myself":
-            $ ans = "Relaxing and enjoying some me-time"
-            $ s_in = 0.0
-        "I feel tired from everything":
-            $ ans = "Feeling exhausted from everything"
-            $ s_in = 0.67
-        "Honestly, it has been a hard day":
-            $ ans = "Honestly, it's been a rough day"
-            $ s_in = 1.0
-
-    $ checkin_s_in_history.append(s_in)
-    call empathy_step("How has your day been so far?", ans, s_in, "checkin_q2", speak=False) from _checkin_q2
-
-    show hana neutral at hana_pos
-    e "Did anything make you feel stressed or upset today?"
-    menu:
-        "Not really":
-            $ ans = "Not really"
-            $ s_in = 0.0
-        "A little bit":
-            $ ans = "A little bit"
-            $ s_in = 0.33
-        "Quite a lot":
-            $ ans = "Quite a lot"
-            $ s_in = 0.67
-        "Almost all day":
-            $ ans = "Almost all day"
-            $ s_in = 1.0
-
-    $ checkin_s_in_history.append(s_in)
-    call empathy_step("Did anything make you feel stressed or upset today?", ans, s_in, "checkin_q3", speak=False) from _checkin_q3
-
-    show hana neutral at hana_pos
-    e "One more question."
-    e "Identify any recent good event"
-    menu:
-        "I did something important":
-            $ ans = "I accomplished something important"
-            $ s_in = 0.0
-        "I had a nice time with someone":
-            $ ans = "I had a nice moment with someone"
-            $ s_in = 0.0
-        "I cannot think of anything":
-            $ ans = "I can't really think of anything"
-            $ s_in = 0.5
-        "It has been hard lately":
-            $ ans = "Honestly, it's been hard lately"
-            $ s_in = 1.0
-
-    $ checkin_s_in_history.append(s_in)
-    call empathy_step("What is one good thing that happened to you recently?", ans, s_in, "checkin_q4", speak=False) from _checkin_q4
-
+    # Check-in is this one question, as in the Adaptive app. The other
+    # questions come once, in the pathway after the stress questions.
     show hana neutral at hana_pos
     jump stress_input
 
-# =======================================================
-# Reusable empathy step:
-#   1) Update Ea, Ec, Ad, Be from latest intensity signal s_in
-#   2) Select empathy mode
-#   3) Speak ONE inline empathy line of the matching type
-#   4) Log everything
-# =======================================================
+# Neutral arm: after every answer HANA gives a plain acknowledgement, never
+# an emotional reply, before the next question.
+define NEUTRAL_ACKS = ["Okay.", "Noted.", "Alright."]
+
 label empathy_step(question, ans, s_in, phase, speak=True):
     $ interaction_count += 1
     $ last_empathy_mode = "neutral"
+    $ last_intention_level = "N/A"
+    $ neutral_ack = renpy.random.choice(NEUTRAL_ACKS)
     $ log_interaction(session_filename, session_id, question, ans,
                       None, stress_level, None, None, None, None, None, None,
-                      "neutral_" + phase)
+                      "neutral_" + phase, extra={"hana_response": neutral_ack})
+    e "[neutral_ack]"
     return
 
 
-# --- Stress input capture ---
 label stress_input:
     $ hana_pos = pick_random_scene_pos()
+    show hana neutral at hana_pos
+    e "Let's check your stress level."
+    e "Think about the past seven days."
+    e "There are no right or wrong answers. Just choose what fits you best."
+
     $ stress_questions = [
-        "After a long day, is it hard for you to relax?",
-        "Do small problems sometimes feel bigger than they really are?",
-        "Do you ever feel nervous for no clear reason?",
-        "Do you get restless more easily than usual?",
-        "Is it hard for you to feel calm and relaxed?",
-        "If something interrupts you, do you get frustrated quickly?",
-        "Do you sometimes feel more sensitive than usual?",
+        _("Was it hard to wind down?"),
+        _("Did you overreact to things?"),
+        _("Did you feel restless?"),
+        _("Was it hard to relax?"),
+        _("Did delays make you upset?"),
+        _("Did you feel easily annoyed?"),
+        _("Was it hard to calm down?"),
     ]
 
     $ stress_responses = []
@@ -932,22 +620,22 @@ label stress_input:
         e "[q!t]"
 
         menu:
-            "Not really, that doesn't apply to me":
+            "Not at all":
                 $ stress_responses.append(0)
                 $ ans = "Not really"
                 $ s_in = 0.0
 
-            "Maybe a little, once in a while":
+            "Sometimes":
                 $ stress_responses.append(1)
                 $ ans = "Maybe a little"
                 $ s_in = 0.33
 
-            "Yes, quite a lot of the time":
+            "Often":
                 $ stress_responses.append(2)
                 $ ans = "Quite a lot"
                 $ s_in = 0.67
 
-            "Almost always":
+            "Most of the time":
                 $ stress_responses.append(3)
                 $ ans = "Almost always"
                 $ s_in = 1.0
@@ -958,9 +646,8 @@ label stress_input:
         $ i += 1
 
 
-    $ hi_count = sum(1 for r in stress_responses if r >= 2)
     show hana neutral at hana_pos
-    e "Responses recorded."
+    e "All response recorded."
 
     show hana neutral at hana_pos
 
@@ -993,428 +680,252 @@ label stress_input:
     $ log_interaction(session_filename, session_id, "Stress score summary", str(raw_score),
                 stress_score, stress_level_desc, None, None, None, None, None, None, "stress_summary")
 
-    # NEUTRAL: route by the measured stress level only. No empathy weighting,
-    # no intention scoring, no learning.
     $ last_empathy_mode = "neutral"
-    $ last_intention_level = "neutral"
+    $ last_intention_level = "N/A"
     if "neutral" not in modes_used_list:
         $ modes_used_list.append("neutral")
-    if stress_level in ["Moderate", "Severe", "Extremely severe"]:
-        $ support_need_announced = True
 
-    # Extremely severe: provide safety information, then go to a calming exercise.
-    if stress_level == "Extremely severe":
-        show hana neutral at hana_pos
-        e "If you ever feel unsafe, contact Befrienders or a healthcare professional. External support options are available."
-        e "Let's start with a short calming exercise."
-        call calming_loop from _reactive_calming_loop
-        $ calming_done = True
-        jump session_end_loop
-
-    # Moderate / Severe: identify the main stressors, then give practical steps.
-    if stress_level in ["Moderate", "Severe"]:
-        show hana neutral at hana_pos
-        e "The next section identifies stress factors and possible actions."
-        show hana neutral at hana_pos
-        call affective_input from _stress_affective_input
-        jump session_end_loop
-
-    # Normal or mild stress
-    else:
-        jump session_end_loop
+    jump neutral_adaptive_pathway
 
 
-# option nk continue ke end
-
-label session_end_loop:
-    $ hana_pos = pick_random_scene_pos()
-    $ session_done = False
-
-    if calming_done:
-        $ continue_session = True
-        while continue_session:
-            show hana neutral at hana_pos
-            e "That exercise is complete."
-            e "You can do another coping exercise, or end the session here."
-
-            menu:
-                "I want to continue a little longer":
-                    $ log_interaction(
-                        session_filename, session_id,
-                        "Session menu", "continue_coping",
-                        stress_score, stress_level_desc, None, None, None, None, None, None,
-                        "session_loop"
-                    )
-                    call calming_loop from _continue_calming_loop
-
-                "That is enough for me today":
-                    if not feedback_given:
-                        call post_response(last_empathy_mode) from _end_post_response
-                    $ log_interaction(
-                        session_filename, session_id,
-                        "Session menu", "end_after_feedback",
-                        stress_score, stress_level_desc, None, None, None, None, None, None,
-                        "session_loop"
-                    )
-                    $ continue_session = False
-
-        call phase5_close_update("exit_after_calming") from _phase5_after_calming
-        return
-
-    while not session_done:
-        # Normal / Mild stress
-        if stress_level in ["Normal", "Mild"]:
-            show hana neutral at hana_pos
-            e "A short breathing exercise is available before ending."
-            e "Select whether to proceed."
-
-            menu:
-                "Yes, let's try it":
-                    $ log_interaction(
-                        session_filename, session_id,
-                        "Session menu", "continue_to_guidance",
-                        stress_score, stress_level_desc, None, None, None, None, None, None,
-                        "session_loop"
-                    )
-                    call calming_loop from _session_end_calming_loop
-                    $ calming_done = True
-                    if not feedback_given:
-                        call post_response(last_empathy_mode) from _guided_post_response
-                    call phase5_close_update("guided") from _phase5_after_guided
-                    $ session_done = True
-
-                "I'll stop here for today":
-                    $ log_interaction(
-                        session_filename, session_id,
-                        "Session menu", "exit",
-                        stress_score, stress_level_desc, None, None, None, None, None, None,
-                        "session_loop"
-                    )
-                    call post_response(last_empathy_mode, "Did checking in today feel helpful?") from _decline_post_response
-                    call phase5_close_update("exit") from _phase5_exit
-                    $ session_done = True
-
-        # Moderate or severe yg tak lepas calming loop
-        else:
-            show hana neutral at hana_pos
-            e "A short calming exercise is available before ending."
-            e "Select whether to proceed."
-
-            menu:
-                "Yes, let's try it":
-                    $ log_interaction(
-                        session_filename, session_id,
-                        "Session menu", "continue_to_guidance",
-                        stress_score, stress_level_desc, None, None, None, None, None, None,
-                        "session_loop"
-                    )
-                    call calming_loop from _session_end_calming_loop_ms
-                    $ calming_done = True
-                    if not feedback_given:
-                        call post_response(last_empathy_mode) from _guided_post_response_ms
-                    call phase5_close_update("guided") from _phase5_after_guided_ms
-                    $ session_done = True
-
-                "I'll stop here for today":
-                    $ log_interaction(
-                        session_filename, session_id,
-                        "Session menu", "exit",
-                        stress_score, stress_level_desc, None, None, None, None, None, None,
-                        "session_loop"
-                    )
-                    call post_response(last_empathy_mode) from _decline_post_response_ms
-                    call phase5_close_update("exit") from _phase5_exit_ms
-                    $ session_done = True
-
+label neutral_adaptive_record(question, answer, phase):
+    call empathy_step(question, answer, 0.0, phase, False)
     return
 
-# --- Affective empathy input ---
-label affective_input:
-    $ hana_pos = pick_random_scene_pos()
-    show hana neutral at hana_pos
-    $ affective_responses = []
-    $ q = "How has this stress been affecting your day-to-day life recently?"
-    e "[q!t]"
 
+label neutral_adaptive_pathway:
+    if stress_level in ["Normal", "Mild"]:
+        $ pathway = "non_stress"
+        jump neutral_adaptive_non_stress
+    $ pathway = "stress"
+    jump neutral_adaptive_stress
+
+
+label neutral_adaptive_non_stress:
+    show hana neutral at hana_pos
+    e "What has been going well lately?"
     menu:
-        "It has been hard to focus on daily tasks.":
-            $ day_impact = "focus"
-            $ ans = "Hard to focus on daily tasks"
-            $ aff_score = 1
-            show hana neutral at hana_pos
-            e "For difficulty focusing, breaking tasks into smaller steps and completing one at a time is a practical way to stay on track."
+        "Family":
+            $ ans = "Family"
+        "Caring for someone":
+            $ ans = "Caring for someone"
+        "Work or daily activities":
+            $ ans = "Work or daily activities"
+        "My health":
+            $ ans = "My health"
+        "Things are just okay":
+            $ ans = "Things are just okay"
+    call neutral_adaptive_record("What has been going well lately?", ans, "non_stress_q1") from _neutral_ns_q1
 
-        "I feel mentally drained most of the time.":
-            $ day_impact = "drained"
-            $ ans = "Mentally drained most of the time"
-            $ aff_score = 3
-            show hana neutral at hana_pos
-            e "A short breathing exercise is available before ending."
-
-        "I keep worrying even when I try to do other things.":
-            $ day_impact = "worry"
-            $ ans = "Keeps worrying during other things"
-            $ aff_score = 2
-            show hana neutral at hana_pos
-            e "For persistent worry, setting aside a fixed time to address concerns keeps them from interrupting other activities."
-
-        "It has affected my sleep, rest, or mood.":
-            $ day_impact = "sleep_mood"
-            $ ans = "Affected sleep, rest, or mood"
-            $ aff_score = 3
-            show hana neutral at hana_pos
-            e "For disrupted sleep, keeping a consistent sleep schedule and limiting screens before bed can improve rest."
-
-    $ affective_responses.append(aff_score)
-    $ s_in = aff_score / 3.0
-    call empathy_step(q, ans, s_in, "affective_followup_q1", speak=False) from _aff_followup_q1
-
-    $ hana_pos = pick_random_scene_pos()
     show hana neutral at hana_pos
-    $ q = "Which parts of your routine have been feeling the most stressful lately?"
-    e "[q!t]"
-
+    e "What helps you feel okay?"
     menu:
-        "Balancing caregiving with work or study":
-            $ routine_stress = "balance"
-            $ ans = "Balancing caregiving with work or study"
-            $ aff_score = 2
-            show hana neutral at hana_pos
-            e "To balance caregiving with work or study, list your tasks and rank them by priority, then focus on the most urgent first."
-
-        "Managing household tasks and caregiving":
-            $ routine_stress = "household"
-            $ ans = "Managing household tasks and caregiving"
-            $ aff_score = 2
-            show hana neutral at hana_pos
-            e "To manage household tasks alongside caregiving, group similar tasks together and delegate where possible to save time and energy."
-
-        "Finding time for myself":
-            $ routine_stress = "personal_time"
-            $ ans = "Finding time for myself"
-            $ aff_score = 1
-            show hana neutral at hana_pos
-            e "To protect time for yourself, schedule short fixed breaks into your day and treat them as fixed appointments."
-
-        "Handling unexpected caregiving needs":
-            $ routine_stress = "unexpected_needs"
-            $ ans = "Handling unexpected caregiving needs"
-            $ aff_score = 3
-            show hana neutral at hana_pos
-            e "For unexpected caregiving needs, preparing a backup plan and a contact list in advance reduces last-minute pressure."
-
-    $ affective_responses.append(aff_score)
-    $ s_in = aff_score / 3.0
-    call empathy_step(q, ans, s_in, "affective_followup_q2", speak=False) from _aff_followup_q2
-
-    $ hana_pos = pick_random_scene_pos()
-    show hana neutral at hana_pos
-    $ q = "Has anything in your life been adding extra weight lately?"
-    e "[q!t]"
-
-    menu:
-        "Worrying about the person I care for":
-            $ extra_weight = "care_recipient_worry"
-            $ ans = "Worrying about the person I care for"
-            $ aff_score = 2
-            show hana neutral at hana_pos
-            e "For worry about the person you care for, focus on what is within your control and note specific concerns to discuss with their healthcare provider."
-
-        "Having too many responsibilities at once":
-            $ extra_weight = "too_many_responsibilities"
-            $ ans = "Having too many responsibilities at once"
-            $ aff_score = 3
-            show hana neutral at hana_pos
-            e "With too many responsibilities, prioritise the essential tasks and postpone or delegate the non-urgent ones to free up capacity."
-
-        "Not getting enough rest or support":
-            $ extra_weight = "lack_of_rest_support"
-            $ ans = "Not getting enough rest or support"
-            $ aff_score = 3
-            show hana neutral at hana_pos
-            e "For limited rest or support, contacting community resources or respite-care services can provide additional help."
-
-        "Something else":
-            $ extra_weight = "other"
-            $ ans = "Something else"
-            $ aff_score = 2
-            show hana neutral at hana_pos
-            e "Identifying the specific source of the pressure is a useful first step toward addressing it."
-
-    $ affective_responses.append(aff_score)
-    $ s_in = aff_score / 3.0
-    call empathy_step(q, ans, s_in, "affective_followup_q3", speak=False) from _aff_followup_q3
+        "Resting":
+            $ ans = "Resting"
+        "Talking to someone":
+            $ ans = "Talking to someone"
+        "Doing something I enjoy":
+            $ ans = "Doing something I enjoy"
+        "Having time alone":
+            $ ans = "Having time alone"
+        "My daily routine":
+            $ ans = "My daily routine"
+    call neutral_adaptive_record("What helps you feel okay?", ans, "non_stress_q2") from _neutral_ns_q2
 
     show hana neutral at hana_pos
-    $ log_interaction(session_filename, session_id, "Neutral guidance summary",
-                      day_impact + "|" + routine_stress + "|" + extra_weight,
-                      stress_score, stress_level_desc, None, None, None, None, None, None,
-                      "neutral_guidance")
-
-    if stress_level == "Severe":
-        e "When stress builds up like this, it helps to take one priority at a time rather than everything at once."
-        e "Writing tasks down and ranking them by urgency can support workload organisation."
-    else:
-        e "A good starting point is to pick out your most urgent tasks and focus on those first."
-        e "Non-essential tasks can be deferred to reduce immediate task load."
-
-    show hana neutral at hana_pos
-    return
-
-# ===========================
-# POST-RESPONSE FEEDBACK
-# ===========================
-label post_response(strategy="general", feedback_prompt="Did checking in today feel helpful?"):
-    $ hana_pos = pick_random_scene_pos()
-    show hana neutral at hana_pos
-    e "[feedback_prompt!t]"
-
+    e "Is there anything you want to talk about?"
     menu:
         "Yes":
-            $ feedback = 1.0
-            $ help_ans = "Yes"
-        "A little":
-            $ feedback = 0.5
-            $ help_ans = "A little"
+            $ ans = "Yes"
         "No":
-            $ feedback = 0.0
-            $ help_ans = "No"
+            $ ans = "No"
+    call neutral_adaptive_record("Is there anything you want to talk about?", ans, "non_stress_q3") from _neutral_ns_q3
+    jump neutral_adaptive_cycle_2
 
-    # NEUTRAL: record the rating only. No feedback learning, no weighting.
-    $ post_rating = {1.0: 5, 0.5: 3, 0.0: 1}[feedback]
 
-    $ log_interaction(
-        session_filename, session_id,
-        "Post-response feedback", help_ans,
-        post_rating, stress_level, None, None, None, None, None, None,
-        "post_response_" + strategy
-    )
+label neutral_adaptive_stress:
+    show hana neutral at hana_pos
+    e "What has been stressful lately?"
+    menu:
+        "Caring for someone":
+            $ ans = "Caring for someone"
+        "Family":
+            $ ans = "Family"
+        "Work or money":
+            $ ans = "Work or money"
+        "Health":
+            $ ans = "Health"
+        "Something else":
+            $ ans = "Something else"
+    call neutral_adaptive_record("What has been stressful lately?", ans, "stress_q1") from _neutral_st_q1
 
     show hana neutral at hana_pos
-    e "Response recorded."
-
-    $ feedback_given = True  # user has now given feedback; session is allowed to end
+    e "What worries you most about it?"
+    menu:
+        "It may get worse":
+            $ ans = "It may get worse"
+        "I can't manage it":
+            $ ans = "I can't manage it"
+        "It affects other people":
+            $ ans = "It affects other people"
+        "I don't know what to do":
+            $ ans = "I don't know what to do"
+        "Something else":
+            $ ans = "Something else"
+    call neutral_adaptive_record("What worries you most about it?", ans, "stress_q2") from _neutral_st_q2
 
     show hana neutral at hana_pos
-    return
+    e "How has this been affecting you?"
+    menu:
+        "I feel tired":
+            $ ans = "I feel tired"
+        "I feel overwhelmed":
+            $ ans = "I feel overwhelmed"
+        "I can't focus":
+            $ ans = "I can't focus"
+        "I can't relax":
+            $ ans = "I can't relax"
+        "Something else":
+            $ ans = "Something else"
+    call neutral_adaptive_record("How has this been affecting you?", ans, "stress_q3") from _neutral_st_q3
 
-#CALMING LOOP
-label calming_loop:
-    $ hana_pos = pick_random_scene_pos()
-    $ loop_count = 0
-    $ max_loops = 3
-    $ techniques = ["breathing", "grounding", "body_scan", "gratitude", "reflection"]
-    $ used_techniques = []
-    $ calm_rating = 0
-    $ should_exit = False
+    show hana neutral at hana_pos
+    e "What usually helps you feel better?"
+    menu:
+        "Resting":
+            $ ans = "Resting"
+        "Talking to someone":
+            $ ans = "Talking to someone"
+        "Doing something I enjoy":
+            $ ans = "Doing something I enjoy"
+        "Having time alone":
+            $ ans = "Having time alone"
+        "Nothing really helps":
+            $ ans = "Nothing really helps"
+    call neutral_adaptive_record("What usually helps you feel better?", ans, "stress_q4") from _neutral_st_q4
 
-    while loop_count < max_loops:
-        # Pick 2 techniques for this round
-        $ available = [t for t in techniques if t not in used_techniques]
-        if len(available) < 2:
-            $ used_techniques = []
-            $ available = list(techniques)
+    show hana neutral at hana_pos
+    e "Who can you talk to when things are difficult?"
+    menu:
+        "Family":
+            $ ans = "Family"
+        "A friend":
+            $ ans = "A friend"
+        "Someone I trust":
+            $ ans = "Someone I trust"
+        "A professional":
+            $ ans = "A professional"
+        "No one":
+            $ ans = "No one"
+    call neutral_adaptive_record("Who can you talk to when things are difficult?", ans, "stress_q5") from _neutral_st_q5
 
-        # part guna technique beza beza untuk returning user
-        $ first_choices = available
-        if loop_count == 0 and avoid_technique_first in available and len(available) > 1:
-            $ first_choices = [t for t in available if t != avoid_technique_first]
-
-        $ tech1 = renpy.random.choice(first_choices)
-        $ used_techniques.append(tech1)
-        $ available = [t for t in available if t != tech1]
-        $ tech2 = renpy.random.choice(available)
-        $ used_techniques.append(tech2)
-        $ last_technique = tech2
-
-        # Deliver first technique
-        call deliver_technique(tech1) from _deliver_tech_a
-
-        # Brief bridge before second technique
+    # Safety: offer counselling contacts, as the Adaptive app does.
+    if ans == "No one":
         show hana neutral at hana_pos
-        e "Another support options will use."
-
-        # Deliver second technique
-        call deliver_technique(tech2) from _deliver_tech_b
-
-        # Ask calm state after both techniques
-        show hana neutral at hana_pos
-        e "Select your current stress state."
+        e "Would you like information about counselling support?"
         menu:
-            "I'm still very stressed":
-                $ calm_rating = 1
-                $ s_in = 1.0
-                $ ans = "Still very stressed"
-            "I'm still a bit stressed":
-                $ calm_rating = 2
-                $ s_in = 0.67
-                $ ans = "A bit stressed"
-            "I'm feeling a little better":
-                $ calm_rating = 3
-                $ s_in = 0.33
-                $ ans = "Somewhere in between"
-            "I'm feeling calmer":
-                $ calm_rating = 4
-                $ s_in = 0.1
-                $ ans = "A little calmer"
-            "I'm feeling much calmer":
-                $ calm_rating = 5
-                $ s_in = 0.0
-                $ ans = "Much calmer"
-            "I'd like to stop for now":
-                $ should_exit = True
-                $ ans = "I'd like to stop"
+            "Yes":
+                $ ans = "Yes"
+            "No":
+                $ ans = "No"
+        call neutral_adaptive_record("Would you like information about counselling support?", ans, "counselling_offer") from _neutral_counselling_offer
+        if ans == "Yes":
+            call support_contacts from _neutral_st_q5_contacts
+    jump neutral_adaptive_cycle_2
 
-        if not should_exit:
-            $ last_calm_rating = calm_rating
-            $ calm_rated_this_session = True
-            $ log_interaction(
-                session_filename, session_id,
-                "Calming loop rating after " + tech1 + "+" + tech2, ans,
-                calm_rating, stress_level, None, None, None, None, None, None,
-                "calming_loop_iter" + str(loop_count + 1) + "_" + tech1 + "_" + tech2
-            )
 
-        $ loop_count += 1
-
-        if should_exit:
-            $ log_interaction(
-                session_filename, session_id,
-                "Calming loop ended (user stopped)", ans,
-                None, stress_level, None, None, None, None, None, None,
-                "calming_loop_user_exit"
-            )
-            show hana neutral at hana_pos
-            e "Alright, we'll stop the exercise here."
-            return
-
-        if calm_rating >= 4:
-            show hana neutral at hana_pos
-            e "That's the end of this exercise."
-            e "These techniques can be repeated after the session ends."
-            if not feedback_given:
-                call post_response(last_empathy_mode) from _calm_post_response_a
-            return
-        else:
-            show hana neutral at hana_pos
-            e "Let's try a different exercise."
-
-    # if user reaches max calm loop but is still stressed
+label neutral_adaptive_cycle_2:
     show hana neutral at hana_pos
-    e "That's the last exercise."
-    e "If high stress persists, consider Befrienders or professional healthcare support."
-    $ log_interaction(
-        session_filename, session_id,
-        "Calming loop ended (max loops)", "rating=" + str(calm_rating),
-        calm_rating, stress_level, None, None, None, None, None, None,
-        "calming_loop_max_reached"
-    )
-    if not feedback_given:
-        call post_response(last_empathy_mode) from _calm_post_response_b
+    if stress_level in ["Normal", "Mild"]:
+        $ c2_question = "What would be helpful now?"
+        e "What would be helpful now?"
+    else:
+        $ c2_question = "What would help you most now?"
+        e "What would help you most now?"
+    menu:
+        "Talk a little more":
+            $ ans = "Talk a little more"
+        "Think about what helps me":
+            $ ans = "Think about what helps me"
+        "Try a short activity":
+            $ ans = "Try a short activity"
+        # As in the Adaptive app: support information on the stress path.
+        "Get support information" if stress_level not in ["Normal", "Mild"]:
+            $ ans = "Get support information"
+        "Nothing right now" if stress_level in ["Normal", "Mild"]:
+            $ ans = "Nothing right now"
+    call neutral_adaptive_record(c2_question, ans, "cycle_2_choice") from _neutral_c2_choice
+    if ans == "Try a short activity":
+        call run_activity from _neutral_c2_activity
+    elif ans == "Get support information":
+        call support_contacts from _neutral_c2_contacts
+
+    show hana neutral at hana_pos
+    e "How do you feel compared with earlier?"
+    menu:
+        "Better":
+            $ ans = "Better"
+        "About the same":
+            $ ans = "About the same"
+        "Worse":
+            $ ans = "Worse"
+    call neutral_adaptive_record("How do you feel compared with earlier?", ans, "checkpoint_1") from _neutral_checkpoint
+
+    show hana neutral at hana_pos
+    e "Would you like to try a short activity?"
+    menu:
+        "Yes, please.":
+            $ ans = "Yes"
+        "No, thanks.":
+            $ ans = "No"
+    call neutral_adaptive_record("Would you like to try a short activity?", ans, "final_activity") from _neutral_final_activity_record
+    if ans == "Yes":
+        call run_activity from _neutral_final_activity
+
+    # Final check, as in the Adaptive app. The closing goes by this answer.
+    show hana neutral at hana_pos
+    e "How do you feel compared with earlier?"
+    menu:
+        "Better":
+            $ final_check = "better"
+            $ ans = "Better"
+        "About the same":
+            $ final_check = "same"
+            $ ans = "About the same"
+        "Worse":
+            $ final_check = "worse"
+            $ ans = "Worse"
+    call neutral_adaptive_record("How do you feel compared with earlier?", ans, "final_check") from _neutral_final_check
+
+    call phase5_close_update("completed") from _neutral_adaptive_close
+    return
+label support_contacts:
+    $ support_need_announced = True
+    show hana neutral at hana_pos
+    e "UUM Counselling Centre: 04-928 4059 / 4060 / 4071"
+    e "MENTARI Kota Setar: 013-434 2359"
+    e "Talian HEAL: 15555"
     return
 
-
-# example techniques 
+label run_activity:
+    show hana neutral at hana_pos
+    e "Which activity would you like to try?"
+    menu:
+        "Breathing":
+            $ ans = "Breathing"
+            $ last_technique = "breathing"
+        "Grounding":
+            $ ans = "Grounding"
+            $ last_technique = "grounding"
+        "Body scan":
+            $ ans = "Body scan"
+            $ last_technique = "body_scan"
+    call neutral_adaptive_record("Which activity would you like to try?", ans, "activity_choice") from _neutral_activity_choice
+    call deliver_technique(last_technique) from _neutral_activity_technique
+    $ hana_pos = hana_mid
+    show hana neutral at hana_pos
+    e "This is the end of the exercise."
+    return
 label deliver_technique(tech):
     $ hana_pos = pick_random_scene_pos()
     python:
@@ -1423,20 +934,20 @@ label deliver_technique(tech):
 
     if tech == "breathing":
         show hana neutral at hana_pos
-        e "This is a breathing exercise."
-        e "Under stress, breathing tends to become quicker and shallower."
-        e "Slowing the breath can lower the physical signs of stress."
+        e "This is breathing exercise."
+        e "Under stress, breathing become more quick and more shallow."
+        e "Slow the breath can lower the physical sign of stress."
         # step Hana to the left for the breathing rounds
         $ hana_pos = hana_left
         show hana neutral at hana_pos
         e "Follow this pattern."
         show breathing_guide at breathing_guide_pos
         python:
-            e(_("Breathe in through your nose for four seconds."), interact=False)
-            renpy.pause(3.0)
-            e(_("Hold your breath for seven seconds."), interact=False)
+            e(_("Breathe in through your nose for four second."), interact=False)
+            renpy.pause(4.0)
+            e(_("Hold your breath for seven second."), interact=False)
             renpy.pause(7.0)
-            e(_("Breathe out through your mouth for eight seconds."), interact=False)
+            e(_("Breathe out through your mouth for eight second."), interact=False)
             renpy.pause(8.0)
             # two full 4-7-8 breathing rounds
             for _round in range(2):
@@ -1447,91 +958,48 @@ label deliver_technique(tech):
                 e(_("Breath out."), interact=False)
                 renpy.pause(8.0)
                 if _round == 0:
-                    e(_("Repeat once more."), interact=False)
+                    e(_("Repeat one more time."), interact=False)
                     renpy.pause(2.0)
         hide breathing_guide
         show hana neutral at hana_pos
-        e "A few slow breaths can reduce the body's stress response."
+        e "A few slow breath can reduce the body stress response."
 
     elif tech == "grounding":
         show hana neutral at hana_pos
         e "This is the 5-4-3-2-1 grounding technique."
-        e "It redirects attention to the present using the senses."
+        e "It bring your attention back to the present using the senses."
         show hana neutral at hana_pos
         e "Identify 5 things you can see."
-        e "Identify 4 things you can physically touch."
+        e "Identify 4 things you can touch."
         e "Identify 3 sounds you can hear."
-        e "Identify 2 things you can smell, or recall smelling."
+        e "Identify 2 things you can smell, or you remember the smell."
         e "Identify 1 thing you can taste."
         show hana neutral at hana_pos
-        e "Grounding can interrupt racing thoughts and bring focus back to the present."
+        e "This grounding can stop the racing thought and bring focus back to the present."
 
     elif tech == "body_scan":
         show hana neutral at hana_pos
-        e "This is a body scan exercise."
-        e "Stress often produces physical tension without notice."
-        e "Common areas are the shoulders, jaw, neck, and hands."
+        e "This is body scan exercise."
+        e "Stress often produce physical tension without you notice."
+        e "The common area is the shoulder, jaw, neck, and hand."
         show hana neutral at hana_pos
-        e "Direct your attention to your body, one area at a time."
+        e "Direct your attention to your body, one area at one time."
         show hana neutral at hana_pos
-        e "Shoulders: let them drop away from your ears."
-        e "Jaw: let it loosen."
-        e "Hands: let them rest."
-        e "Then scan the neck, chest, and stomach for tension."
+        e "Shoulder: let it drop away from your ear."
+        e "Jaw: let it loose."
+        e "Hand: let it rest."
+        e "After that, scan the neck, chest, and stomach for tension."
         show hana neutral at hana_pos
-        e "Where you find tension, note it without trying to change it."
-        e "Noticing where tension sits is the first step to releasing it."
-
-    elif tech == "gratitude":
-        show hana neutral at hana_pos
-        e "This is a gratitude exercise."
-        show hana neutral at hana_pos
-        e "Under stress, attention narrows toward problems and unfinished tasks."
-        e "Noting something positive can offset that bias."
-        show hana neutral at hana_pos
-        e "Identify one thing that has been good or useful recently."
-        e "It does not need to be significant."
-        e "Examples: a conversation, a meal, or a quiet moment."
-        show hana neutral at hana_pos
-        e "Hold that example in mind for a few seconds."
-        e "Brief positive recall can shift attention away from stressors."
-
-    elif tech == "reflection":
-        stop music fadeout 2.0
-        show beachscene at scene_right
-        show hana neutral at hana_left
-        e "This is a guided imagery exercise."
-        e "It involves picturing a calm location in detail."
-        e "It is commonly used to reduce stress in the moment."
-        show hana neutral at hana_left
-        e "Choose a place you find calm, such as a beach, a lake, or a forest."
-        show hana neutral at hana_left
-        e "Picture the scene."
-        e "Note what is visible: colours, light, and detail."
-        e "Note the sounds, such as waves, birds, or wind."
-        e "Note physical sensations, such as warmth, cool air, or the ground underfoot."
-        show hana neutral at hana_left
-        e "Take one slow breath in."
-        e "And out."
-        e "Stay with the image for a few moments."
-        e "You can return to this image whenever stress increases."
-        hide beachscene
-        if music_pref:
-            play music "audio/BGM/Hana_lofi.mp3" volume 0.2 fadein 3.0 loop
+        e "Where you find tension, just note it, do not try to change it."
+        e "To notice where the tension is, that is the first step to release it."
 
     return
 
 #phase 5: closure 
 label phase5_close_update(end_action):
-
-    $ final_calm_text = "unknown"
-    if last_calm_rating is not None:
-        if last_calm_rating >= 4:
-            $ final_calm_text = "calmer"
-        elif last_calm_rating <= 2:
-            $ final_calm_text = "still_stressed"
-        else:
-            $ final_calm_text = "in_between"
+    $ show_close_contacts = final_check == "worse" or (final_check != "better" and stress_level not in ["Normal", "Mild"])
+    if show_close_contacts:
+        $ support_need_announced = True
 
     python:
         assert session_id is not None and session_id != "", "ERROR: session_id must be set"
@@ -1540,16 +1008,8 @@ label phase5_close_update(end_action):
 
         session_end_time = datetime.datetime.now()
         session_duration = (session_end_time - session_start_time).total_seconds() / 60.0
-        calm_residual_factor = {1: 1.0, 2: 0.8, 3: 0.6, 4: 0.35, 5: 0.15}
-        end_baseline = initial_stress_score if initial_stress_score else session_start_stress
-        if calm_rated_this_session and last_calm_rating is not None:
-            residual = calm_residual_factor.get(last_calm_rating, 1.0)
-            session_end_stress = int(round(end_baseline * residual))
-        else:
-            session_end_stress = end_baseline
-
+        session_end_stress = initial_stress_score
         stress_improvement = session_start_stress - session_end_stress
-
         profile = save_user_profile(user_name, {
             "name": user_name,
             "visit_count": user_profile.get("visit_count", 0) + 1,
@@ -1559,7 +1019,6 @@ label phase5_close_update(end_action):
             "last_empathy_mode": last_empathy_mode,
             "last_intention_level": last_intention_level,
             "last_empathy_E": round(last_empathy_E, 4),
-            "last_calm_rating": last_calm_rating,
             "last_technique": last_technique,
             "last_end_action": end_action,
             "support_need_announced": support_need_announced,
@@ -1570,18 +1029,24 @@ label phase5_close_update(end_action):
             "visit_count": profile.get("visit_count", 0),
             "last_session_id": profile.get("last_session_id", session_id),
             "last_stress_level": profile.get("last_stress_level", stress_level),
-            "last_calm_rating": profile.get("last_calm_rating", last_calm_rating),
         })
 
         log_session_summary(
             session_filename, session_id, user_name,
             session_start_stress, session_end_stress,
             modes_used_list, techniques_used_list,
-            interaction_count, last_calm_rating,
+            interaction_count, None,  # final calm rating: no longer asked
             round(session_duration, 2), end_action,
             stress_improvement,
             stress_level, last_empathy_mode, last_intention_level,
-            round(last_empathy_E, 4), support_need_announced
+            round(last_empathy_E, 4), support_need_announced,
+            extra={
+                "session_start": session_start_time.strftime("%Y-%m-%d %H:%M:%S"),
+                "session_index": profile.get("visit_count", ""),
+                "dass_raw": raw_score,
+                "dass_score": initial_stress_score,
+                "pathway": pathway,
+            },
         )
 
     # terus save after every flow nak avoid user tak save progress
@@ -1590,13 +1055,11 @@ label phase5_close_update(end_action):
     show hana neutral at hana_pos
     e "Session complete."
 
-    if final_calm_text == "still_stressed":
-        e "If high stress persists, consider contacting Befrienders (03-7627 2929) or a healthcare professional."
+    if show_close_contacts:
+        e "If high stress persists, counselling support is available."
+        call support_contacts from _neutral_close_contacts
 
-    e "A new session can be started later."
+    e "A new session can start later."
     stop music fadeout 5.0
 
     return
-
-
-
